@@ -8,7 +8,7 @@ namespace RestartManager
     using System;
     using Xunit;
 
-    public partial class ServiceContainerTests
+    public class ServiceContainerTests
     {
         [Fact]
         public void AddService_Null_Throws()

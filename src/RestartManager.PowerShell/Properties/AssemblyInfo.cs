@@ -16,5 +16,6 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("dfb42013-4b85-4348-ba11-da3f733c5396")]
-[assembly: InternalsVisibleTo("RestartManager.PowerShell.Test")]
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: InternalsVisibleTo("RestartManager.PowerShell.Test")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
