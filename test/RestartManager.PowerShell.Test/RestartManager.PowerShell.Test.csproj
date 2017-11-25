@@ -78,11 +78,13 @@
     <Compile Include="ValidateTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="..\..\stylecop.json">
+    <AdditionalFiles Include="..\..\inc\stylecop.json">
       <Link>stylecop.json</Link>
       <Visible>False</Visible>
     </AdditionalFiles>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\RestartManager.PowerShell\RestartManager.PowerShell.csproj">

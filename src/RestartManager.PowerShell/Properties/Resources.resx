@@ -120,4 +120,7 @@
   <data name="Error_ServiceExists" xml:space="preserve">
     <value>The service is already defined.</value>
   </data>
+  <data name="Warning_NoFiles" xml:space="preserve">
+    <value>No files were added since no file paths were detected.</value>
+  </data>
 </root>

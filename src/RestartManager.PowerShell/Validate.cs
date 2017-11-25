@@ -1,6 +1,6 @@
 ﻿// <copyright file="Validate.cs" company="Heath Stewart">
 // Copyright (c) 2017 Heath Stewart
-// See the LICENSE file in the project root for more information.
+// See the LICENSE.txt file in the project root for more information.
 // </copyright>
 
 namespace RestartManager

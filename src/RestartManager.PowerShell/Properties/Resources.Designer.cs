@@ -68,5 +68,14 @@ namespace RestartManager.Properties {
                 return ResourceManager.GetString("Error_ServiceExists", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No files were added since no file paths were detected..
+        /// </summary>
+        internal static string Warning_NoFiles {
+            get {
+                return ResourceManager.GetString("Warning_NoFiles", resourceCulture);
+            }
+        }
     }
 }

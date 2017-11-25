@@ -43,6 +43,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.PowerShell.3.ReferenceAssemblies.1.0.0\lib\net4\System.Management.Automation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,6 +60,13 @@
     <Compile Include="IServiceContainer.cs" />
     <Compile Include="IServiceProvider.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="PowerShell\Nouns.cs" />
+    <Compile Include="PowerShell\RegisterResourceCommand.cs" />
+    <Compile Include="PowerShell\StopProcessCommand.cs" />
+    <Compile Include="PowerShell\RestartProcessCommand.cs" />
+    <Compile Include="PowerShell\StopSessionCommand.cs" />
+    <Compile Include="PowerShell\StartSessionCommand.cs" />
+    <Compile Include="ProgressEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -67,15 +78,16 @@
     <Compile Include="ServiceContainer.cs" />
     <Compile Include="Validate.cs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="PowerShell\" />
-  </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="..\..\stylecop.json">
+    <AdditionalFiles Include="..\..\inc\stylecop.json">
       <Link>stylecop.json</Link>
       <Visible>False</Visible>
     </AdditionalFiles>
     <None Include="packages.config" />
+    <None Include="RestartManager.psd1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />

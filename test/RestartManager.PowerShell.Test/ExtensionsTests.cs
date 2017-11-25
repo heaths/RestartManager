@@ -1,6 +1,6 @@
 ﻿// <copyright file="ExtensionsTests.cs" company="Heath Stewart">
 // Copyright (c) 2017 Heath Stewart
-// See the LICENSE file in the project root for more information.
+// See the LICENSE.txt file in the project root for more information.
 // </copyright>
 
 namespace RestartManager
@@ -31,21 +31,36 @@ namespace RestartManager
         }
 
         [Fact]
-        public void GetService_Services_Null_Throws()
+        public void GetService_Services_Null_Creates()
         {
             ITestService testService = null;
 
             IServiceProvider sut = null;
-            Assert.Throws<ArgumentNullException>("services", () => sut.GetService(ref testService));
+            var actual = sut.GetService(ref testService, () => new TestService());
+
+            Assert.NotNull(testService);
+            Assert.Same(testService, actual);
         }
 
         [Fact]
-        public void GetService_Not_Defined_Throws()
+        public void GetService_Null_Throws()
         {
             ITestService testService = null;
 
             var sut = new ServiceContainer();
-            Assert.Throws<NotImplementedException>(() => sut.GetService(ref testService, throwIfNotDefined: true));
+            Assert.Throws<ArgumentNullException>("factory", () => sut.GetService(ref testService, null));
+        }
+
+        [Fact]
+        public void GetService_Not_Defined_Creates()
+        {
+            ITestService testService = null;
+
+            var sut = new ServiceContainer();
+            var actual = sut.GetService(ref testService, () => new TestService());
+
+            Assert.NotNull(testService);
+            Assert.Same(testService, actual);
         }
 
         [Fact]
@@ -57,7 +72,7 @@ namespace RestartManager
             var sut = new ServiceContainer();
             sut.AddService<ITestService>(a);
 
-            var actual = sut.GetService(ref b, throwIfNotDefined: true);
+            var actual = sut.GetService(ref b, () => throw new Exception());
             Assert.Same(a, actual);
             Assert.Same(actual, b);
         }

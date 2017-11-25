@@ -1,6 +1,6 @@
 ﻿// <copyright file="NativeMethods.cs" company="Heath Stewart">
 // Copyright (c) 2017 Heath Stewart
-// See the LICENSE file in the project root for more information.
+// See the LICENSE.txt file in the project root for more information.
 // </copyright>
 
 namespace RestartManager
@@ -22,6 +22,8 @@ namespace RestartManager
     {
         internal const int ERROR_SUCCESS = 0;
         internal const int ERROR_OUTOFMEMORY = 14;
+        internal const int ERROR_BAD_ARGUMENTS = 160;
+        internal const int ERROR_MAX_SESSIONS_REACHED = 353;
 
         internal const int CCH_RM_SESSION_KEY = 32;
 
