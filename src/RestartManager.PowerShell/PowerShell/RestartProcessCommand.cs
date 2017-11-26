@@ -6,6 +6,7 @@
 namespace RestartManager.PowerShell
 {
     using System.Management.Automation;
+    using RestartManager.Properties;
 
     /// <summary>
     /// The Restart-RestartManagerProcess cmdlet.
@@ -24,7 +25,25 @@ namespace RestartManager.PowerShell
         {
             base.EndProcessing();
 
-            Session.RestartProcesses();
+            Session.RestartProgress += OnProgress;
+            try
+            {
+                Session.RestartProcesses();
+            }
+            finally
+            {
+                Session.RestartProgress -= OnProgress;
+            }
+        }
+
+        private void OnProgress(object sender, ProgressEventArgs e)
+        {
+            var progress = new ProgressRecord(GetHashCode(), Resources.Activity, Resources.RestartStatus)
+            {
+                PercentComplete = e.PercentComplete,
+            };
+
+            WriteProgress(progress);
         }
     }
 }

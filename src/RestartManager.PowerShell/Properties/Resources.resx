@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Activity" xml:space="preserve">
+    <value>Windows Restart Manager</value>
+  </data>
   <data name="Error_ServiceExists" xml:space="preserve">
     <value>The service is already defined.</value>
+  </data>
+  <data name="RestartStatus" xml:space="preserve">
+    <value>Restarting applications and services</value>
+  </data>
+  <data name="ShutdownStatus" xml:space="preserve">
+    <value>Shutting down applications and services</value>
   </data>
   <data name="Warning_NoFiles" xml:space="preserve">
     <value>No files were added since no file paths were detected.</value>

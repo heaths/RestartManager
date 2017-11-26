@@ -69,12 +69,12 @@ namespace RestartManager
         /// <summary>
         /// Gets a value indicating whether this object is disposed.
         /// </summary>
-        internal bool IsDisposed { get; private set; }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether any processes are registered.
         /// </summary>
-        internal bool IsRegistered { get; private set; }
+        public bool IsRegistered { get; private set; }
 
         private IRestartManagerService RestartManagerService =>
             services.GetService(ref restartManagerService, () => WindowsRestartManagerService.Default);

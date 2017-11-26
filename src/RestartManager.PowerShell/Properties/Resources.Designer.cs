@@ -61,11 +61,38 @@ namespace RestartManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Windows Restart Manager.
+        /// </summary>
+        internal static string Activity {
+            get {
+                return ResourceManager.GetString("Activity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The service is already defined..
         /// </summary>
         internal static string Error_ServiceExists {
             get {
                 return ResourceManager.GetString("Error_ServiceExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restarting applications and services.
+        /// </summary>
+        internal static string RestartStatus {
+            get {
+                return ResourceManager.GetString("RestartStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shutting down applications and services.
+        /// </summary>
+        internal static string ShutdownStatus {
+            get {
+                return ResourceManager.GetString("ShutdownStatus", resourceCulture);
             }
         }
         

@@ -26,7 +26,7 @@ namespace RestartManager.PowerShell
         /// <summary>
         /// Gets or sets the path of a file resource to add. Wildcards are supported.
         /// </summary>
-        [Parameter(ParameterSetName = nameof(Path), Position = 0, ValueFromPipelineByPropertyName = true)]
+        [Parameter(ParameterSetName = nameof(Path), Position = 0)]
         [ValidateNotNullOrEmpty]
         public string[] Path { get; set; }
 
