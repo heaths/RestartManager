@@ -8,7 +8,6 @@ namespace RestartManager
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
@@ -129,7 +128,7 @@ namespace RestartManager
         /// <param name="services">Optional collection of service names.</param>
         /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
         /// <exception cref="Win32Exception">An error occured.</exception>
-        internal void RegisterResources(IEnumerable<string> files = null, IEnumerable<Process> processes = null, IEnumerable<string> services = null)
+        internal void RegisterResources(IEnumerable<string> files = null, IEnumerable<IProcess> processes = null, IEnumerable<string> services = null)
         {
             ThrowIfDisposed();
 
@@ -137,10 +136,57 @@ namespace RestartManager
             {
                 IsRegistered = true;
 
-                var uniqueProcesses = processes?.Select(process => (RM_UNIQUE_PROCESS)process);
+                var uniqueProcesses = processes?.Select(process => new RM_UNIQUE_PROCESS(process));
                 var error = RestartManagerService.RegisterResources(SessionId, files, uniqueProcesses, services);
                 ThrowOnError(error);
             }
+        }
+
+        /// <summary>
+        /// Gets the applications and services that will be shut down and possibly restated.
+        /// </summary>
+        /// <returns>An enumeration of <see cref="IProcessInfo"/> objects.</returns>
+        /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
+        /// <exception cref="Win32Exception">An error occured.</exception>
+        internal IEnumerable<IProcessInfo> GetProcesses()
+        {
+            ThrowIfDisposed();
+
+            if (IsRegistered)
+            {
+                var error = NativeMethods.ERROR_SUCCESS;
+                var length = 0;
+                RM_PROCESS_INFO[] processes = null;
+                var reason = RebootReason.None;
+
+                do
+                {
+                    error = RestartManagerService.GetProcesses(SessionId, out var required, ref length, processes, out reason);
+                    if (error == NativeMethods.ERROR_SUCCESS)
+                    {
+                        break;
+                    }
+                    else if (error == NativeMethods.ERROR_MORE_DATA)
+                    {
+                        length = required;
+                        processes = new RM_PROCESS_INFO[length];
+                    }
+                    else
+                    {
+                        ThrowOnError(error);
+                    }
+                }
+                while (error == NativeMethods.ERROR_MORE_DATA);
+
+                if (processes != null && processes.Length > 0)
+                {
+                    return processes
+                        .Select(process => new ProcessInfo(process, reason))
+                        .ToArray();
+                }
+            }
+
+            return Enumerable.Empty<IProcessInfo>();
         }
 
         /// <summary>

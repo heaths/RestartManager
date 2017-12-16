@@ -12,6 +12,7 @@ PowerShellVersion = '3.0'
 ModuleToProcess = 'RestartManager.PowerShell.dll'
 CmdletsToExport = @(
   # Explicitly export cmdlets to support constrained language mode.
+  'Get-RestartManagerProcess'
   'Register-RestartManagerResource'
   'Restart-RestartManagerProcess'
   'Start-RestartManagerSession'

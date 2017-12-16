@@ -46,6 +46,10 @@ namespace RestartManager
             NativeMethods.RmRegisterResources(sessionId, files?.Count() ?? 0, files?.ToArray(), processes?.Count() ?? 0, processes?.ToArray(), services?.Count() ?? 0, services?.ToArray());
 
         /// <inheritdoc/>
+        public int GetProcesses(int sessionId, out int processesLengthRequired, ref int processesLength, RM_PROCESS_INFO[] processes, out RebootReason rebootReason) =>
+            NativeMethods.RmGetList(sessionId, out processesLengthRequired, ref processesLength, processes, out rebootReason);
+
+        /// <inheritdoc/>
         public int ShutdownProcesses(int sessionId, RM_SHUTDOWN_TYPE shutdownType, RM_WRITE_STATUS_CALLBACK progress) =>
             NativeMethods.RmShutdown(sessionId, shutdownType, progress);
 

@@ -21,7 +21,7 @@ namespace RestartManager.PowerShell
     {
         private readonly Lazy<IList<string>> files = new Lazy<IList<string>>(() => new List<string>());
         private readonly Lazy<IList<string>> services = new Lazy<IList<string>>(() => new List<string>());
-        private readonly Lazy<IList<Process>> processes = new Lazy<IList<Process>>(() => new List<Process>());
+        private readonly Lazy<IList<IProcess>> processes = new Lazy<IList<IProcess>>(() => new List<IProcess>());
 
         /// <summary>
         /// Gets or sets the path of a file resource to add. Wildcards are supported.
@@ -100,7 +100,8 @@ namespace RestartManager.PowerShell
             {
                 foreach (var process in Process)
                 {
-                    processes.Value.Add(process);
+                    var adapter = new ProcessAdapter(process);
+                    processes.Value.Add(adapter);
                 }
             }
         }

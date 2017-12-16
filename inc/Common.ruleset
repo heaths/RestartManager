@@ -2,7 +2,11 @@
 <RuleSet Name="Common" Description=" " ToolsVersion="15.0">
   <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1005" Action="None" />
     <Rule Id="SA1101" Action="None" />
+    <Rule Id="SA1124" Action="None" />
+    <Rule Id="SA1512" Action="None" />
+    <Rule Id="SA1515" Action="None" />
     <Rule Id="SX1101" Action="Warning" />
   </Rules>
 </RuleSet>
