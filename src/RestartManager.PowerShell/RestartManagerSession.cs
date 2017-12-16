@@ -127,7 +127,7 @@ namespace RestartManager
         /// <param name="processes">Optional collection of processes.</param>
         /// <param name="services">Optional collection of service names.</param>
         /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
-        /// <exception cref="Win32Exception">An error occured.</exception>
+        /// <exception cref="Win32Exception">An error occurred.</exception>
         internal void RegisterResources(IEnumerable<string> files = null, IEnumerable<IProcess> processes = null, IEnumerable<string> services = null)
         {
             ThrowIfDisposed();
@@ -147,7 +147,7 @@ namespace RestartManager
         /// </summary>
         /// <returns>An enumeration of <see cref="IProcessInfo"/> objects.</returns>
         /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
-        /// <exception cref="Win32Exception">An error occured.</exception>
+        /// <exception cref="Win32Exception">An error occurred.</exception>
         internal IEnumerable<IProcessInfo> GetProcesses()
         {
             ThrowIfDisposed();
@@ -195,7 +195,7 @@ namespace RestartManager
         /// <param name="force">Whether to force applications to shutdown if no response. The default is false.</param>
         /// <param name="onlyRegistered">Whether to only shut down applications if registered with Restart Manager. The default is false.</param>
         /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
-        /// <exception cref="Win32Exception">An error occured.</exception>
+        /// <exception cref="Win32Exception">An error occurred.</exception>
         /// <seealso cref="ShutdownProgress"/>
         internal void ShutdownProcesses(bool force = false, bool onlyRegistered = false)
         {
@@ -220,7 +220,7 @@ namespace RestartManager
         /// Restarts applications and services previously shut down by Restart Manager.
         /// </summary>
         /// <exception cref="ObjectDisposedException">This object has already been disposed.</exception>
-        /// <exception cref="Win32Exception">An error occured.</exception>
+        /// <exception cref="Win32Exception">An error occurred.</exception>
         /// <seealso cref="RestartProgress"/>
         internal void RestartProcesses()
         {

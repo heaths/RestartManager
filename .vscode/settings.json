@@ -1,0 +1,10 @@
+{
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.encoding": "utf8",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.vs": true
+    },
+    "files.insertFinalNewline": false
+}

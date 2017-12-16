@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell (Debug)",
+            "type": "clr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${env:SystemRoot}/System32/WindowsPowerShell/v1.0/powershell.exe",
+            "args": [
+                "-nologo",
+                "-noexit",
+                "-command",
+                "&{ import-module ./RestartManager.psd1 }"
+            ],
+            "cwd": "${workspaceFolder}/src/RestartManager.PowerShell/bin/Debug",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ]
+}
