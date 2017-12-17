@@ -7,7 +7,7 @@ Author = 'Heath Stewart'
 CompanyName = 'Heath Stewart'
 Description = 'Exposes Windows Restart Manager to Windows PowerShell'
 Copyright = 'Copyright (c) 2017 Heath Stewart'
-ModuleVersion = '1.0.0.0'
+ModuleVersion = '$BuildVersion$'
 PowerShellVersion = '3.0'
 ModuleToProcess = 'RestartManager.PowerShell.dll'
 CmdletsToExport = @(
@@ -22,7 +22,7 @@ CmdletsToExport = @(
 PrivateData = @{
   PSData = @{
     ProjectUri = 'https://github.com/heaths/restartmanager'
-    LicenseUri = 'https://raw.githubusercontent.com/heaths/restartmanager/master/LICENSE.txt'
+    LicenseUri = 'https://raw.githubusercontent.com/heaths/restartmanager/$CommitId$/LICENSE.txt'
   }
 }
 }

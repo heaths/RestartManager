@@ -1,0 +1,39 @@
+configuration:
+  - Debug
+  - Release
+
+image: Visual Studio 2017
+
+environment:
+  RunCodeAnalysis: true
+  TreatWarningsAsErrors: true
+
+branches:
+  only:
+    - master
+    - develop
+
+skip_tags: true
+
+notifications:
+  - provider: GitHubPullRequest
+    on_build_success: true
+    on_build_failure: true
+
+cache:
+  - packages -> **\packages.config
+
+install:
+  - nuget restore
+
+build:
+  parallel: true
+
+test:
+  assemblies:
+    - test\**\bin\$(configuration)\*.test.dll
+
+artifacts:
+  - path: src\RestartManager.PowerShell\bin\$(configuration)
+    name: RestartManager
+    type: zip

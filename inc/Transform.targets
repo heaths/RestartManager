@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright (c) 2017 Heath Stewart
+See the LICENSE.txt file in the project root for more information.
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <Template>
+      <OutputFilePath>$(OutputPath)%(Filename)%(Extension)</OutputFilePath>
+    </Template>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <AvailableItemName Include="Template" />
+  </ItemGroup>
+
+  <UsingTask TaskName="ReplaceToken" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <InputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <OutputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Reference Include="$(MSBuildToolsPath)\Microsoft.Build.Utilities.Core.dll" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
+      <Using Namespace="Microsoft.Build.Utilities" />
+      <Code Type="Fragment" Language="C#">
+        <![CDATA[
+        for (var i = 0; i < InputFiles.Length; ++i)
+        {
+          string content;
+          Encoding encoding;
+
+          var path = InputFiles[i].ItemSpec;
+          using (var reader = new StreamReader(path, Encoding.UTF8, true))
+          {
+            content = reader.ReadToEnd();
+            encoding = reader.CurrentEncoding;
+
+            var metadata = InputFiles[i].CloneCustomMetadata();
+            foreach (string key in metadata.Keys)
+            {
+              var value = (string)metadata[key];
+              content = content.Replace("$" + key + "$", value);
+            }
+
+            if (OutputFiles != null && i < OutputFiles.Length)
+            {
+              path = OutputFiles[i].ItemSpec;
+
+              var directory = Path.GetDirectoryName(path);
+              Directory.CreateDirectory(directory);
+            }
+          }
+
+          File.WriteAllText(path, content, encoding);
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="Transform" BeforeTargets="CoreCompile" DependsOnTargets="GetBuildVersion" Inputs="@(Template);$(MSBuildThisFile)" Outputs="%(Template.OutputFilePath)">
+    <ItemGroup>
+      <_Template Include="@(Template)">
+        <BuildVersion>$(BuildVersion)</BuildVersion>
+        <CommitId>$(GitCommitIdShort)</CommitId>
+      </_Template>
+    </ItemGroup>
+    <Message Text="Transforming: &quot;%(_Template.Identity)&quot; -> &quot;%(_Template.OutputFilePath)&quot;" />
+    <ReplaceToken InputFiles="@(_Template)" OutputFiles="%(_Template.OutputFilePath)">
+      <Output TaskParameter="OutputFiles" ItemName="FileWrites" />
+    </ReplaceToken>
+  </Target>
+</Project>
