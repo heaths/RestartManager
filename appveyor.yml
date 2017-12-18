@@ -48,10 +48,9 @@ nuget:
 
 deploy:
   - provider: NuGet
-    server: https://ci.appveyor.com/nuget/heaths-restartmanager
+    symbol_server: https://ci.appveyor.com/nuget/heaths
     api_key:
-      secure: tiIueTm7jWnBG+OU2XmH4ZZF2hGTJxLyzMug3DMYv3g=
-    skip_symbols: false
-    symbol_server: https://ci.appveyor.com/nuget/heaths-restartmanager
+      secure: FD8o+SxdA+nxTC1GRb5381yjQXgRS+B/8dtxyaWllpg=
+    artifact: /.*\.symbols\.nupkg/
     on:
       configuration: Release
