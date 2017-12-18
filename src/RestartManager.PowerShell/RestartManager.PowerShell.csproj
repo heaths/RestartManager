@@ -93,6 +93,7 @@
       <Visible>False</Visible>
     </AdditionalFiles>
     <None Include="packages.config" />
+    <None Include="RestartManager.nuspec" />
     <Template Include="RestartManager.psd1" />
   </ItemGroup>
   <ItemGroup>

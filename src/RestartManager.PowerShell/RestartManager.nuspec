@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>RestartManager</id>
+    <version>$Version$</version>
+    <title>Restart Manager PowerShell Module</title>
+    <authors>heaths</authors>
+    <owners>heaths</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/heaths/RestartManager/tree/$CommitId$/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/heaths/RestartManager</projectUrl>
+    <description>Exposes Windows Restart Manager to Windows PowerShell</description>
+    <summary>Exposes Windows Restart Manager to Windows PowerShell</summary>
+    <copyright>Copyright (c) 2017 Heath Stewart</copyright>
+    <developmentDependency>true</developmentDependency>
+    <releaseNotes>https://github.com/heaths/RestartManager/releases/tag/$Version$</releaseNotes>
+    <tags>
+      PSModule
+      PSIncludes_Cmdlet
+      PSCmdlet_Get-RestartManagerProcess
+      PSCmdlet_Register-RestartManagerResource
+      PSCmdlet_Restart-RestartManagerProcess
+      PSCmdlet_Start-RestartManagerSession
+      PSCmdlet_Stop-RestartManagerProcess
+      PSCmdlet_Stop-RestartManagerSession
+    </tags>
+  </metadata>
+  <files>
+    <file src="bin\$Configuration$\RestartManager.psd1"/>
+    <file src="bin\$Configuration$\RestartManager*.dll"/>
+    <file src="bin\$Configuration$\RestartManager*.pdb"/>
+    <file src="..\..\LICENSE.txt"/>
+  </files>
+</package>

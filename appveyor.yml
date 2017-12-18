@@ -29,11 +29,29 @@ install:
 build:
   parallel: true
 
+after_build:
+  - nuget pack src\RestartManager.PowerShell\RestartManager.nuspec -OutputDirectory bin\%configuration% -Version %GitBuildVersionSimple% -Symbols -NoPackageAnalysis -Properties "Configuration=%configuration%;CommitId=%APPVEYOR_REPO_COMMIT%"
+
 test:
   assemblies:
-    - test\**\bin\$(configuration)\*.test.dll
+    only:
+      - test\**\bin\$(configuration)\*.test.dll
 
 artifacts:
+  - path: bin\$(configuration)\*.nupkg
   - path: src\RestartManager.PowerShell\bin\$(configuration)
     name: RestartManager
     type: zip
+
+nuget:
+  project_feed: true
+
+deploy:
+  - provider: NuGet
+    server: https://ci.appveyor.com/nuget/heaths-restartmanager
+    api_key:
+      secure: tiIueTm7jWnBG+OU2XmH4ZZF2hGTJxLyzMug3DMYv3g=
+    skip_symbols: false
+    symbol_server: https://ci.appveyor.com/nuget/heaths-restartmanager
+    on:
+      configuration: Release

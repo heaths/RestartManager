@@ -67,7 +67,10 @@ See the LICENSE.txt file in the project root for more information.
   <Target Name="Transform" BeforeTargets="CoreCompile" DependsOnTargets="GetBuildVersion" Inputs="@(Template);$(MSBuildThisFile)" Outputs="%(Template.OutputFilePath)">
     <ItemGroup>
       <_Template Include="@(Template)">
-        <BuildVersion>$(BuildVersion)</BuildVersion>
+        <Version>$(BuildVersionSimple)</Version>
+        <FileVersion>$(BuildVersion)</FileVersion>
+        <PackageVersion>$(PackageVersion)</PackageVersion>
+        <PrereleaseVersion>$(PrereleaseVersion)</PrereleaseVersion>
         <CommitId>$(GitCommitIdShort)</CommitId>
       </_Template>
     </ItemGroup>
