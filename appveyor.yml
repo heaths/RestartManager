@@ -30,7 +30,7 @@ build:
   parallel: true
 
 after_build:
-  - nuget pack src\RestartManager.PowerShell\RestartManager.nuspec -OutputDirectory bin\%configuration% -Version %GitBuildVersionSimple% -Symbols -NoPackageAnalysis -Properties "Configuration=%configuration%;CommitId=%APPVEYOR_REPO_COMMIT%"
+  - nuget pack src\RestartManager.PowerShell\RestartManager.nuspec -OutputDirectory bin\%configuration% -Version %GitPackageVersion% -Symbols -NoPackageAnalysis -Properties "Configuration=%configuration%;CommitId=%APPVEYOR_REPO_COMMIT%"
 
 test:
   assemblies:

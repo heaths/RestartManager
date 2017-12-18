@@ -115,4 +115,11 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
+  <Target Name="SetAdditionalCloudBuildVars" DependsOnTargets="GetBuildVersion" BeforeTargets="SetCloudBuildVersionVars">
+    <ItemGroup>
+      <CloudBuildVersionVars Include="GitPackageVersion">
+        <Value>$(PackageVersion)</Value>
+      </CloudBuildVersionVars>
+    </ItemGroup>
+  </Target>
 </Project>
