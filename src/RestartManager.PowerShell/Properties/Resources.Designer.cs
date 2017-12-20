@@ -61,6 +61,24 @@ namespace RestartManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run Start-RestartManagerSession to start a session..
+        /// </summary>
+        internal static string Action_StartSession {
+            get {
+                return ResourceManager.GetString("Action_StartSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run Stop-RestartManagerSession or pass -Force to end the current session..
+        /// </summary>
+        internal static string Action_StopSession {
+            get {
+                return ResourceManager.GetString("Action_StopSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Windows Restart Manager.
         /// </summary>
         internal static string Activity {
@@ -70,11 +88,38 @@ namespace RestartManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument is empty..
+        /// </summary>
+        internal static string Error_EmptyArgument {
+            get {
+                return ResourceManager.GetString("Error_EmptyArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No active session..
+        /// </summary>
+        internal static string Error_NoSession {
+            get {
+                return ResourceManager.GetString("Error_NoSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The service is already defined..
         /// </summary>
         internal static string Error_ServiceExists {
             get {
                 return ResourceManager.GetString("Error_ServiceExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A session is already active..
+        /// </summary>
+        internal static string Error_SessionExists {
+            get {
+                return ResourceManager.GetString("Error_SessionExists", resourceCulture);
             }
         }
         

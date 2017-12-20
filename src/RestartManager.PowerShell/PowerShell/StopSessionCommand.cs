@@ -12,14 +12,8 @@ namespace RestartManager.PowerShell
     /// The Stop-RestartManagerSession cmdlet.
     /// </summary>
     [Cmdlet(VerbsLifecycle.Stop, Nouns.RestartManagerSession)]
-    public class StopSessionCommand : Cmdlet
+    public class StopSessionCommand : SessionCommand
     {
-        /// <summary>
-        /// Gets or sets the <see cref="RestartManagerSession"/> to stop.
-        /// </summary>
-        [Parameter(Mandatory = true, Position = 0)]
-        public RestartManagerSession Session { get; set; }
-
         /// <inheritdoc/>
         protected override void EndProcessing()
         {
@@ -29,8 +23,13 @@ namespace RestartManager.PowerShell
             {
                 Session?.Dispose();
             }
-            catch (ObjectDisposedException)
+            catch (NoSessionException ex)
             {
+                WriteDebug(ex.Message);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                WriteDebug(ex.Message);
             }
         }
     }

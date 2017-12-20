@@ -8,7 +8,8 @@ See the LICENSE.txt file in the project root for more information.
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemDefinitionGroup>
     <Template>
-      <OutputFilePath>$(OutputPath)%(Filename)%(Extension)</OutputFilePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
     </Template>
   </ItemDefinitionGroup>
 
@@ -64,7 +65,33 @@ See the LICENSE.txt file in the project root for more information.
     </Task>
   </UsingTask>
 
-  <Target Name="Transform" BeforeTargets="CoreCompile" DependsOnTargets="GetBuildVersion" Inputs="@(Template);$(MSBuildThisFile)" Outputs="%(Template.OutputFilePath)">
+  <PropertyGroup>
+    <AssignTargetPathsDependsOn>
+      $(AssignTargetPathsDependsOn);
+      TransformOutputGroup;
+    </AssignTargetPathsDependsOn>
+    <TransformOutputGroupDependsOn>
+      PrepareForBuild;
+      $(TransformOutputGroupDependsOn);
+    </TransformOutputGroupDependsOn>
+  </PropertyGroup>
+  <Target Name="TransformOutputGroup" DependsOnTargets="$(TransformOutputGroupDependsOn)" Returns="@(AllItemsFullPathWithTargetPath)">
+    <ItemGroup>
+      <_TransformOutputGroup Include="@(Template->'$(OutputPath)%(TargetPath)')" KeepMetadata="CopyToOutputDirectory" />
+      <AllItemsFullPathWithTargetPath Include="@(_TransformOutputGroup->'%(FullPath)')">
+        <TargetPath>%(Filename)%(Extension)</TargetPath>
+      </AllItemsFullPathWithTargetPath>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TransformDependsOn>
+      GetBuildVersion;
+      TransformOutputGroup;
+      $(TransformDependsOn);
+    </TransformDependsOn>
+  </PropertyGroup>
+  <Target Name="Transform" BeforeTargets="CoreCompile" DependsOnTargets="$(TransformDependsOn)" Inputs="@(Template);$(MSBuildThisFile)" Outputs="@(_TransformOutputGroup)">
     <ItemGroup>
       <_Template Include="@(Template)">
         <Version>$(BuildVersionSimple)</Version>
@@ -74,8 +101,8 @@ See the LICENSE.txt file in the project root for more information.
         <CommitId>$(GitCommitIdShort)</CommitId>
       </_Template>
     </ItemGroup>
-    <Message Text="Transforming: &quot;%(_Template.Identity)&quot; -> &quot;%(_Template.OutputFilePath)&quot;" />
-    <ReplaceToken InputFiles="@(_Template)" OutputFiles="%(_Template.OutputFilePath)">
+    <Message Text="Transforming: &quot;%(_Template.Identity)&quot; -> &quot;@(_TransformOutputGroup)&quot;" />
+    <ReplaceToken InputFiles="@(_Template)" OutputFiles="@(_TransformOutputGroup)">
       <Output TaskParameter="OutputFiles" ItemName="FileWrites" />
     </ReplaceToken>
   </Target>

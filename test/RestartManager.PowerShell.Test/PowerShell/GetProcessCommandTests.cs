@@ -33,7 +33,7 @@ namespace RestartManager.PowerShell
                 .Setup(x => x.GetProcesses(sessionId, out processLengthRequired, ref processLength, null, out rebootReason))
                 .Returns(14);
 
-            var session = RestartManagerSession.Create(services);
+            var session = new RestartManagerSession(services);
             session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
 
             var sut = new GetProcessCommand
@@ -79,7 +79,7 @@ namespace RestartManager.PowerShell
                 })
                 .Returns(0);
 
-            var session = RestartManagerSession.Create(services);
+            var session = new RestartManagerSession(services);
             session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
 
             var sut = new GetProcessCommand

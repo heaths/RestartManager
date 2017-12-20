@@ -6,6 +6,7 @@
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
+using Xunit;
 
 [assembly: AssemblyTitle("Windows Restart Manager PowerShell Tests")]
 [assembly: AssemblyDescription("Tests for the PowerShell Module for Windows Restart Manager")]
@@ -16,3 +17,5 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: Guid("a7e40093-fc95-4c7a-add0-05052f1b539e")]
 [assembly: NeutralResourcesLanguage("en")]
+
+[assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass)]

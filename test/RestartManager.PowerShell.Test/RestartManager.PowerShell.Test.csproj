@@ -75,8 +75,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="MockContainer.cs" />
+    <Compile Include="MockRestartManagerService.cs" />
+    <Compile Include="MockService.cs" />
+    <Compile Include="MockServiceFactory.cs" />
     <Compile Include="NativeMethodsTests.cs" />
     <Compile Include="PowerShell\GetProcessCommandTests.cs" />
+    <Compile Include="PowerShell\MockVariableService.cs" />
+    <Compile Include="PowerShell\RunspaceCollection.cs" />
+    <Compile Include="PowerShell\RunspaceException.cs" />
+    <Compile Include="PowerShell\RunspaceFixture.cs" />
+    <Compile Include="PowerShell\StartSessionCommandTests.cs" />
+    <Compile Include="PowerShell\StopSessionCommandTests.cs" />
+    <Compile Include="PowerShell\TestableHost.cs" />
     <Compile Include="ProcessAdapterTests.cs" />
     <Compile Include="ProcessInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

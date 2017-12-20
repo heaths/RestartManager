@@ -117,11 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Action_StartSession" xml:space="preserve">
+    <value>Run Start-RestartManagerSession to start a session.</value>
+  </data>
+  <data name="Action_StopSession" xml:space="preserve">
+    <value>Run Stop-RestartManagerSession or pass -Force to end the current session.</value>
+  </data>
   <data name="Activity" xml:space="preserve">
     <value>Windows Restart Manager</value>
   </data>
+  <data name="Error_EmptyArgument" xml:space="preserve">
+    <value>The argument is empty.</value>
+  </data>
+  <data name="Error_NoSession" xml:space="preserve">
+    <value>No active session.</value>
+  </data>
   <data name="Error_ServiceExists" xml:space="preserve">
     <value>The service is already defined.</value>
+  </data>
+  <data name="Error_SessionExists" xml:space="preserve">
+    <value>A session is already active.</value>
   </data>
   <data name="RestartStatus" xml:space="preserve">
     <value>Restarting applications and services</value>

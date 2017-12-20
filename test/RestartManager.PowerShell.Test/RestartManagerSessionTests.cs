@@ -18,7 +18,7 @@ namespace RestartManager
         [InlineData(NativeMethods.ERROR_OUTOFMEMORY, typeof(OutOfMemoryException))]
         [InlineData(NativeMethods.ERROR_BAD_ARGUMENTS, typeof(ArgumentException))]
         [InlineData(NativeMethods.ERROR_MAX_SESSIONS_REACHED, typeof(Win32Exception))]
-        public void Create_Throws(int error, Type exceptionType)
+        public void New_Throws(int error, Type exceptionType)
         {
             var services = new ServiceContainer();
 
@@ -29,11 +29,11 @@ namespace RestartManager
             var sessionKey = "1234abcd";
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(error);
 
-            Assert.Throws(exceptionType, () => RestartManagerSession.Create(services));
+            Assert.Throws(exceptionType, () => new RestartManagerSession(services));
         }
 
         [Fact]
-        public void Create_Starts_Session()
+        public void New_Starts_Session()
         {
             var services = new ServiceContainer();
 
@@ -44,7 +44,7 @@ namespace RestartManager
             var sessionKey = "1234abcd";
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 Assert.Equal(1, sut.SessionId);
                 Assert.Equal("1234abcd", sut.SessionKey);
@@ -64,7 +64,7 @@ namespace RestartManager
             var sessionKey = "1234abcd";
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 // Make sure we do not attempt to end again.
                 sut.Dispose();
@@ -87,7 +87,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
             RestartManagerSession sut;
-            using (sut = RestartManagerSession.Create(services))
+            using (sut = new RestartManagerSession(services))
             {
             }
 
@@ -106,7 +106,7 @@ namespace RestartManager
             var sessionKey = "1234abcd";
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 sut.RegisterResources();
             }
@@ -127,7 +127,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
             rmMock.Setup(x => x.RegisterResources(sessionId, It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<RM_UNIQUE_PROCESS>>(), It.IsAny<IEnumerable<string>>())).Returns(NativeMethods.ERROR_OUTOFMEMORY);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 Assert.Throws<OutOfMemoryException>(() => sut.RegisterResources(files: new[] { @"C:\ShouldNotExist" }));
             }
@@ -151,7 +151,7 @@ namespace RestartManager
                 @"C:\ShouldNotExist",
             };
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 sut.RegisterResources(files: files);
             }
@@ -172,7 +172,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
             RestartManagerSession sut;
-            using (sut = RestartManagerSession.Create(services))
+            using (sut = new RestartManagerSession(services))
             {
             }
 
@@ -192,7 +192,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
             rmMock.Setup(x => x.ShutdownProcesses(sessionId, RM_SHUTDOWN_TYPE.RmForceShutdown, It.IsAny<RM_WRITE_STATUS_CALLBACK>())).Returns(NativeMethods.ERROR_OUTOFMEMORY);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 Assert.Throws<OutOfMemoryException>(() => sut.ShutdownProcesses(force: true));
             }
@@ -216,7 +216,7 @@ namespace RestartManager
                 @"C:\ShouldNotExist",
             };
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 sut.ShutdownProcesses();
             }
@@ -237,7 +237,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
 
             RestartManagerSession sut;
-            using (sut = RestartManagerSession.Create(services))
+            using (sut = new RestartManagerSession(services))
             {
             }
 
@@ -257,7 +257,7 @@ namespace RestartManager
             rmMock.Setup(x => x.StartSession(out sessionId, out sessionKey)).Returns(NativeMethods.ERROR_SUCCESS);
             rmMock.Setup(x => x.RestartProcesses(sessionId, It.IsAny<RM_WRITE_STATUS_CALLBACK>())).Returns(NativeMethods.ERROR_OUTOFMEMORY);
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 Assert.Throws<OutOfMemoryException>(() => sut.RestartProcesses());
             }
@@ -281,7 +281,7 @@ namespace RestartManager
                 @"C:\ShouldNotExist",
             };
 
-            using (var sut = RestartManagerSession.Create(services))
+            using (var sut = new RestartManagerSession(services))
             {
                 sut.RestartProcesses();
             }

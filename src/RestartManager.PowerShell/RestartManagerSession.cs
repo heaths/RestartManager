@@ -22,12 +22,29 @@ namespace RestartManager
         /// <summary>
         /// Initializes a new instance of the <see cref="RestartManagerSession"/> class.
         /// </summary>
+        /// <param name="services">Optional services to provide this object.</param>
+        internal RestartManagerSession(IServiceProvider services = null)
+        {
+            restartManagerService = services?.GetService<IRestartManagerService>() ?? WindowsRestartManagerService.Default;
+
+            var error = restartManagerService.StartSession(out var sessionId, out var sessionKey);
+            ThrowOnError(error);
+
+            SessionId = sessionId;
+            SessionKey = sessionKey;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RestartManagerSession"/> class.
+        /// </summary>
         /// <param name="services">Services to provide this object.</param>
         /// <param name="sessionId">The session identity.</param>
         /// <param name="sessionKey">The session key.</param>
         /// <exception cref="ArgumentNullException"><paramref name="services"/> is null.</exception>
-        private RestartManagerSession(IServiceProvider services, int sessionId, string sessionKey)
+        internal RestartManagerSession(IServiceProvider services, int sessionId, string sessionKey)
         {
+            Validate.NotNull(services, nameof(services));
+
             this.services = services;
 
             SessionId = sessionId;
@@ -75,6 +92,12 @@ namespace RestartManager
         /// </summary>
         public bool IsRegistered { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> used to create this session.
+        /// </summary>
+        /// <value>May be null if a real session was created.</value>
+        internal IServiceProvider Services => services;
+
         private IRestartManagerService RestartManagerService =>
             services.GetService(ref restartManagerService, () => WindowsRestartManagerService.Default);
 
@@ -83,20 +106,6 @@ namespace RestartManager
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Creates and starts a new <see cref="RestartManagerSession"/>.
-        /// </summary>
-        /// <param name="services">Services to create and start a new <see cref="RestartManagerSession"/>.</param>
-        /// <returns>A new <see cref="RestartManagerSession"/>.</returns>
-        internal static RestartManagerSession Create(IServiceProvider services)
-        {
-            var restartManagerService = services?.GetService<IRestartManagerService>() ?? WindowsRestartManagerService.Default;
-            var error = restartManagerService.StartSession(out var sessionId, out var sessionKey);
-            ThrowOnError(error);
-
-            return new RestartManagerSession(services, sessionId, sessionKey);
         }
 
         /// <summary>

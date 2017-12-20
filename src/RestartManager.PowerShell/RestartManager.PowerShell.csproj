@@ -64,9 +64,17 @@
     <Compile Include="IServiceContainer.cs" />
     <Compile Include="IServiceProvider.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="PowerShell\ActiveSessionException.cs" />
+    <Compile Include="PowerShell\Extensions.cs" />
     <Compile Include="PowerShell\GetProcessCommand.cs" />
+    <Compile Include="PowerShell\ITestableHost.cs" />
+    <Compile Include="PowerShell\IVariableService.cs" />
+    <Compile Include="PowerShell\NoSessionException.cs" />
     <Compile Include="PowerShell\Nouns.cs" />
     <Compile Include="PowerShell\RegisterResourceCommand.cs" />
+    <Compile Include="PowerShell\RunspaceVariableService.cs" />
+    <Compile Include="PowerShell\SessionCommand.cs" />
+    <Compile Include="PowerShell\SessionManager.cs" />
     <Compile Include="PowerShell\StopProcessCommand.cs" />
     <Compile Include="PowerShell\RestartProcessCommand.cs" />
     <Compile Include="PowerShell\StopSessionCommand.cs" />
