@@ -7,6 +7,7 @@ namespace RestartManager.PowerShell
 {
     using System;
     using System.Management.Automation;
+    using System.Runtime.Serialization;
     using System.Threading;
     using RestartManager.Properties;
 
@@ -26,6 +27,17 @@ namespace RestartManager.PowerShell
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ActiveSessionException"/> class.
+        /// </summary>
+        /// <param name="info">A <see cref="SerializationInfo"/> into which objects are serialized.</param>
+        /// <param name="context"><see cref="StreamingContext"/> that describes the underlying stream context.</param>
+        protected ActiveSessionException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            error = info.GetValue(nameof(ErrorRecord), typeof(ErrorRecord)) as ErrorRecord;
+        }
+
         /// <inheritdoc/>
         public ErrorRecord ErrorRecord => LazyInitializer.EnsureInitialized(ref error, () =>
         {
@@ -37,5 +49,13 @@ namespace RestartManager.PowerShell
                 },
             };
         });
+
+        /// <inheritdoc/>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue(nameof(ErrorRecord), ErrorRecord);
+        }
     }
 }
