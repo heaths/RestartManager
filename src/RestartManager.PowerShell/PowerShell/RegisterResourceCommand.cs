@@ -17,7 +17,7 @@ namespace RestartManager.PowerShell
     /// The Register-RestartManagerResource cmdlet.
     /// </summary>
     [Cmdlet(VerbsLifecycle.Register, Nouns.RestartManagerResource, DefaultParameterSetName = nameof(Path))]
-    public class RegisterResourceCommand : PSCmdlet
+    public class RegisterResourceCommand : SessionCommand
     {
         private readonly Lazy<IList<string>> files = new Lazy<IList<string>>(() => new List<string>());
         private readonly Lazy<IList<string>> services = new Lazy<IList<string>>(() => new List<string>());
@@ -55,12 +55,6 @@ namespace RestartManager.PowerShell
         [Parameter(ValueFromPipeline = true)]
         [ValidateNotNullOrEmpty]
         public Process[] Process { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="RestartManagerSession"/> with which to register resources.
-        /// </summary>
-        [Parameter(Mandatory = true)]
-        public RestartManagerSession Session { get; set; }
 
         /// <inheritdoc/>
         protected override void ProcessRecord()

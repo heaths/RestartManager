@@ -2,8 +2,11 @@
 
 Thank you for your interest in making this module better!
 
-This is a simple solution that targets PowerShell 3.0 and newer and, therefore, .NET Framework 4.5 and newer. You should be able to build this module in Visual Studio 2012 or newer (note: developed originally in Visual Studio 2017) and all
-dependencies are obtained via NuGet.
+## Requirements
+
+This is a simple solution that targets PowerShell 3.0 and newer and, therefore, .NET Framework 4.5 and newer. Because C# 7.0 languge features are used, Visual Studio 2017 is required. All other dependencies are obtained via nuget.
+
+* Visual Studio 2017
 
 ## Setup
 

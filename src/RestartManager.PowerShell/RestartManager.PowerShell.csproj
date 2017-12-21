@@ -80,6 +80,7 @@
     <Compile Include="PowerShell\StopSessionCommand.cs" />
     <Compile Include="PowerShell\StartSessionCommand.cs" />
     <Compile Include="ProcessAdapter.cs" />
+    <Compile Include="ProcessComparer.cs" />
     <Compile Include="ProcessInfo.cs" />
     <Compile Include="ProgressEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

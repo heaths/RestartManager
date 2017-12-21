@@ -6,92 +6,121 @@
 namespace RestartManager.PowerShell
 {
     using System;
-    using System.Linq;
+    using System.Management.Automation;
     using Moq;
     using Xunit;
 
+    [Collection(RunspaceCollection.DefinitionName)]
     public class GetProcessCommandTests
     {
+        private static readonly string CommandName = "Get-RestartManagerProcess";
+        private readonly RunspaceFixture fixture;
+
+        public GetProcessCommandTests(RunspaceFixture fixture)
+        {
+            this.fixture = fixture;
+        }
+
         [Fact]
         public void ProcessRecord_Throws()
         {
-            var services = new ServiceContainer();
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService, MockRestartManagerService>()
+                    .StartSession()
+                    .RegisterResources()
+                    .GetProcesses(error: NativeMethods.ERROR_OUTOFMEMORY)
+                    .EndSession()
+                    .Pop();
 
-            var restartManagerServiceMock = new Mock<IRestartManagerService>();
-            services.AddService(restartManagerServiceMock.Object);
-
-            var sessionId = 0;
-            var sessionKey = "1234";
-            restartManagerServiceMock
-                .Setup(x => x.StartSession(out sessionId, out sessionKey))
-                .Returns(0);
-
-            var processLength = 0;
-            var processLengthRequired = 0;
-            var rebootReason = RebootReason.None;
-            restartManagerServiceMock
-                .Setup(x => x.GetProcesses(sessionId, out processLengthRequired, ref processLength, null, out rebootReason))
-                .Returns(14);
-
-            var session = new RestartManagerSession(services);
-            session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
-
-            var sut = new GetProcessCommand
+            using (var session = new RestartManagerSession(services))
             {
-                Session = session,
-            };
+                session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
 
-            var output = sut.Invoke<IProcessInfo>();
-            Assert.Throws<OutOfMemoryException>(() => output.Any());
+                var sut = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session);
+
+                var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
+                Assert.IsType<OutOfMemoryException>(ex.InnerException);
+            }
         }
 
         [Fact]
         public void ProcessRecord()
         {
-            var services = new ServiceContainer();
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService, MockRestartManagerService>()
+                    .StartSession()
+                    .RegisterResources()
+                    .GetProcesses()
+                    .EndSession()
+                    .Pop();
 
-            var restartManagerServiceMock = new Mock<IRestartManagerService>();
-            services.AddService(restartManagerServiceMock.Object);
-
-            var sessionId = 0;
-            var sessionKey = "1234";
-            restartManagerServiceMock
-                .Setup(x => x.StartSession(out sessionId, out sessionKey))
-                .Returns(0);
-
-            var processLength = 0;
-            var processLengthRequired = 2;
-            var rebootReason = RebootReason.None;
-            restartManagerServiceMock
-                .Setup(x => x.GetProcesses(sessionId, out processLengthRequired, ref processLength, null, out rebootReason))
-                .Returns(234);
-
-            processLength = 2;
-            restartManagerServiceMock
-                .Setup(x => x.GetProcesses(sessionId, out processLengthRequired, ref processLength, It.Is<RM_PROCESS_INFO[]>(ary => ary.Length == 2), out rebootReason))
-                .OutCallback((int sid, out int plr, ref int pl, RM_PROCESS_INFO[] processes, out RebootReason rr) =>
-                {
-                    plr = processLengthRequired;
-                    rr = rebootReason;
-
-                    processes[0] = new RM_PROCESS_INFO { ApplicationType = ApplicationType.MainWindow, bRestartable = true, strAppName = "a" };
-                    processes[1] = new RM_PROCESS_INFO { ApplicationType = ApplicationType.Service, bRestartable = true, strAppName = "b", strServiceShortName = "b" };
-                })
-                .Returns(0);
-
-            var session = new RestartManagerSession(services);
-            session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
-
-            var sut = new GetProcessCommand
+            using (var session = new RestartManagerSession(services))
             {
-                Session = session,
-            };
+                session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
 
-            var output = sut.Invoke<IProcessInfo>();
-            Assert.Collection(
-                output,
-                x => Assert.True(x.ApplicationType == ApplicationType.MainWindow && x.IsRestartable && x.Description == "a"),
-                x => Assert.True(x.ApplicationType == ApplicationType.Service && x.IsRestartable && x.Description == "b" && x.ServiceName == "b"));
+                var output = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke<IProcessInfo>();
+
+                var expected = MockRestartManagerService.GetDefaultProcessesInfo(RebootReason.None);
+                Assert.Equal(expected, output, ProcessComparer.Default);
+            }
+        }
+
+        [Fact]
+        public void No_Session_Throws()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IVariableService, MockVariableService>()
+                    .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
+                    .Pop();
+
+            using (fixture.SetServices(services))
+            {
+                var sut = fixture.Create()
+                    .AddCommand(CommandName);
+
+                var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
+                Assert.IsType<NoSessionException>(ex.InnerException);
+            }
+        }
+
+        [Fact]
+        public void Session_Variable()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService, MockRestartManagerService>()
+                    .StartSession()
+                    .RegisterResources()
+                    .GetProcesses()
+                    .EndSession()
+                    .Pop()
+                .Push<IVariableService, MockVariableService>()
+                    .GetValue(SessionManager.VariableName, s =>
+                    {
+                        var session = new RestartManagerSession(s);
+                        session.RegisterResources(files: new[] { @"C:\ShouldNotExist.txt" });
+
+                        return session;
+                    })
+                    .Pop();
+
+            using (fixture.SetServices(services))
+            {
+                var output = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddStatement()
+                    .AddCommand("Stop-RestartManagerSession")
+                    .Invoke<IProcessInfo>();
+
+                var expected = MockRestartManagerService.GetDefaultProcessesInfo(RebootReason.None);
+                Assert.Equal(expected, output, ProcessComparer.Default);
+            }
+
+            services.Verify();
         }
     }
 }

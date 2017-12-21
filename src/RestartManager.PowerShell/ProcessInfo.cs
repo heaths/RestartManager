@@ -10,7 +10,7 @@ namespace RestartManager
     /// <summary>
     /// Information about a process from the Restart Manager.
     /// </summary>
-    public class ProcessInfo : IProcessInfo
+    public class ProcessInfo : IProcessInfo, IEquatable<IProcessInfo>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessInfo"/> class.
@@ -54,5 +54,8 @@ namespace RestartManager
 
         /// <inheritdoc/>
         public RebootReason RebootReason { get; }
+
+        /// <inheritdoc/>
+        public bool Equals(IProcessInfo other) => ProcessComparer.Default.Equals(this, other);
     }
 }
