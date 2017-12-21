@@ -28,6 +28,7 @@ namespace RestartManager.PowerShell
             var services = new MockContainer(MockBehavior.Strict)
                 .Push<IRestartManagerService, MockRestartManagerService>()
                     .StartSession(error: NativeMethods.ERROR_OUTOFMEMORY)
+                    .EndSession()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
@@ -74,22 +75,27 @@ namespace RestartManager.PowerShell
         [Fact]
         public void Overrides_Session_Throws()
         {
+            RestartManagerSession session = null;
             var services = new MockContainer(MockBehavior.Strict)
                 .Push<IRestartManagerService, MockRestartManagerService>()
                     .StartSession()
+                    .EndSession()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
-                    .GetValue(SessionManager.VariableName, s => new RestartManagerSession(s))
+                    .GetValue(SessionManager.VariableName, s => session = new RestartManagerSession(s))
                     .Pop();
 
             using (fixture.SetServices(services))
             {
-                var sut = fixture.Create()
-                    .AddCommand(CommandName)
-                    .AddParameter("PassThru");
+                using (session)
+                {
+                    var sut = fixture.Create()
+                        .AddCommand(CommandName)
+                        .AddParameter("PassThru");
 
-                var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
-                Assert.IsType<ActiveSessionException>(ex.InnerException);
+                    var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
+                    Assert.IsType<ActiveSessionException>(ex.InnerException);
+                }
             }
         }
 
@@ -107,18 +113,21 @@ namespace RestartManager.PowerShell
 
             using (fixture.SetServices(services))
             {
-                var sut = fixture.Create()
-                    .AddCommand(CommandName)
-                    .AddParameter("Force")
-                    .AddParameter("PassThru");
-
-                using (var session = sut.Invoke<RestartManagerSession>().Single())
+                using (original)
                 {
-                    Assert.Equal(0, session.SessionId);
-                    Assert.Equal("123abc", session.SessionKey);
-                    Assert.NotSame(original, session);
+                    var sut = fixture.Create()
+                        .AddCommand(CommandName)
+                        .AddParameter("Force")
+                        .AddParameter("PassThru");
 
-                    services.Verify<IVariableService>(x => x.SetValue(SessionManager.VariableName, session));
+                    using (var session = sut.Invoke<RestartManagerSession>().Single())
+                    {
+                        Assert.Equal(0, session.SessionId);
+                        Assert.Equal("123abc", session.SessionKey);
+                        Assert.NotSame(original, session);
+
+                        services.Verify<IVariableService>(x => x.SetValue(SessionManager.VariableName, session));
+                    }
                 }
             }
         }
@@ -138,17 +147,20 @@ namespace RestartManager.PowerShell
             original.Dispose();
             using (fixture.SetServices(services))
             {
-                var sut = fixture.Create()
-                    .AddCommand(CommandName)
-                    .AddParameter("PassThru");
-
-                using (var session = sut.Invoke<RestartManagerSession>().Single())
+                using (original)
                 {
-                    Assert.Equal(0, session.SessionId);
-                    Assert.Equal("123abc", session.SessionKey);
-                    Assert.NotSame(original, session);
+                    var sut = fixture.Create()
+                        .AddCommand(CommandName)
+                        .AddParameter("PassThru");
 
-                    services.Verify<IVariableService>(x => x.SetValue(SessionManager.VariableName, session));
+                    using (var session = sut.Invoke<RestartManagerSession>().Single())
+                    {
+                        Assert.Equal(0, session.SessionId);
+                        Assert.Equal("123abc", session.SessionKey);
+                        Assert.NotSame(original, session);
+
+                        services.Verify<IVariableService>(x => x.SetValue(SessionManager.VariableName, session));
+                    }
                 }
             }
         }

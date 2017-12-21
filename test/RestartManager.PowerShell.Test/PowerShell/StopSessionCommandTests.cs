@@ -45,14 +45,16 @@ namespace RestartManager.PowerShell
         {
             var services = new MockContainer(MockBehavior.Strict)
                 .Push<IRestartManagerService, MockRestartManagerService>()
-                    .EndSession(0)
+                    .EndSession()
                     .Pop();
 
-            var session = new RestartManagerSession(services, 0, "123abc");
-            fixture.Create()
-                .AddCommand(CommandName)
-                .AddParameter("Session", session)
-                .Invoke();
+            using (var session = new RestartManagerSession(services, 0, "123abc"))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke();
+            }
 
             services.Verify<IRestartManagerService>(x => x.EndSession(0), Times.Once);
         }
@@ -80,7 +82,7 @@ namespace RestartManager.PowerShell
         {
             var services = new MockContainer(MockBehavior.Strict)
                 .Push<IRestartManagerService, MockRestartManagerService>()
-                    .EndSession(0)
+                    .EndSession()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue(SessionManager.VariableName, s => new RestartManagerSession(s, 0, "123abc"))

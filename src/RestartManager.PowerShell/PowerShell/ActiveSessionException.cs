@@ -17,6 +17,7 @@ namespace RestartManager.PowerShell
     [Serializable]
     public class ActiveSessionException : Exception, IContainsErrorRecord
     {
+        [NonSerialized]
         private ErrorRecord error;
 
         /// <summary>
@@ -35,7 +36,6 @@ namespace RestartManager.PowerShell
         protected ActiveSessionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            error = info.GetValue(nameof(ErrorRecord), typeof(ErrorRecord)) as ErrorRecord;
         }
 
         /// <inheritdoc/>
@@ -51,11 +51,7 @@ namespace RestartManager.PowerShell
         });
 
         /// <inheritdoc/>
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
+        public override void GetObjectData(SerializationInfo info, StreamingContext context) =>
             base.GetObjectData(info, context);
-
-            info.AddValue(nameof(ErrorRecord), ErrorRecord);
-        }
     }
 }
