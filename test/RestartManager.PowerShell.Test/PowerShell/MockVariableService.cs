@@ -6,6 +6,9 @@
 namespace RestartManager.PowerShell
 {
     using System;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Moq;
 
     /// <summary>
     /// Mock <see cref="IVariableService"/>.
@@ -69,6 +72,32 @@ namespace RestartManager.PowerShell
             var value = action?.Invoke(Services);
             Mock.Setup(x => x.GetValue<T>(name))
                 .Returns(value)
+                .Verifiable();
+
+            return this;
+        }
+
+        public MockVariableService SetValue<T>(string name, T value = null)
+            where T : class
+        {
+            // Dynamically build expression to bind only supplied parameters.
+            var args = new Expression[]
+            {
+                Expression.Constant(name),
+                Expression.Call(typeof(It).GetMethod(nameof(It.IsAny), BindingFlags.Static | BindingFlags.Public).MakeGenericMethod(typeof(T))),
+            };
+
+            if (value != null)
+            {
+                args[1] = Expression.Constant(value);
+            }
+
+            var param = Expression.Parameter(typeof(IVariableService), "x");
+            Expression<Action<IVariableService>> expression = Expression.Lambda<Action<IVariableService>>(
+                Expression.Call(param, typeof(IVariableService).GetMethod(nameof(IVariableService.SetValue)).MakeGenericMethod(typeof(T)), args),
+                param);
+
+            Mock.Setup(expression)
                 .Verifiable();
 
             return this;

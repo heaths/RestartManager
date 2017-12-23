@@ -23,11 +23,10 @@ namespace RestartManager.PowerShell
         public void Session_Disposed()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .EndSession()
+                .Push<IRestartManagerService>()
                     .Pop();
 
-            var session = new RestartManagerSession(services, 0, "123abc");
+            var session = new RestartManagerSession(services);
             session.Dispose();
 
             services.Verify<IRestartManagerService>(x => x.EndSession(0), Times.Once);
@@ -44,11 +43,10 @@ namespace RestartManager.PowerShell
         public void Ends_Session()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .EndSession()
+                .Push<IRestartManagerService>()
                     .Pop();
 
-            using (var session = new RestartManagerSession(services, 0, "123abc"))
+            using (var session = new RestartManagerSession(services))
             {
                 fixture.Create()
                     .AddCommand(CommandName)
@@ -67,7 +65,7 @@ namespace RestartManager.PowerShell
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 fixture.Create()
                     .AddCommand(CommandName)
@@ -81,14 +79,13 @@ namespace RestartManager.PowerShell
         public void Ends_Session_Variable()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .EndSession()
+                .Push<IRestartManagerService>()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
-                    .GetValue(SessionManager.VariableName, s => new RestartManagerSession(s, 0, "123abc"))
+                    .GetValue(SessionManager.VariableName, s => new RestartManagerSession(s))
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 fixture.Create()
                     .AddCommand(CommandName)

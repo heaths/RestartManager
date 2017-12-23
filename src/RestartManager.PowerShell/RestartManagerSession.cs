@@ -17,6 +17,7 @@ namespace RestartManager
     public class RestartManagerSession : IDisposable
     {
         private readonly IServiceProvider services;
+        private readonly bool isStarted = false;
         private IRestartManagerService restartManagerService = null;
 
         /// <summary>
@@ -25,6 +26,8 @@ namespace RestartManager
         /// <param name="services">Optional services to provide this object.</param>
         internal RestartManagerSession(IServiceProvider services = null)
         {
+            this.services = services;
+
             restartManagerService = services?.GetService<IRestartManagerService>() ?? WindowsRestartManagerService.Default;
 
             var error = restartManagerService.StartSession(out var sessionId, out var sessionKey);
@@ -32,23 +35,7 @@ namespace RestartManager
 
             SessionId = sessionId;
             SessionKey = sessionKey;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RestartManagerSession"/> class.
-        /// </summary>
-        /// <param name="services">Services to provide this object.</param>
-        /// <param name="sessionId">The session identity.</param>
-        /// <param name="sessionKey">The session key.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="services"/> is null.</exception>
-        internal RestartManagerSession(IServiceProvider services, int sessionId, string sessionKey)
-        {
-            Validate.NotNull(services, nameof(services));
-
-            this.services = services;
-
-            SessionId = sessionId;
-            SessionKey = sessionKey;
+            isStarted = true;
         }
 
         /// <summary>
@@ -264,8 +251,11 @@ namespace RestartManager
                 return;
             }
 
-            RestartManagerService.EndSession(SessionId);
             IsDisposed = true;
+            if (isStarted)
+            {
+                RestartManagerService.EndSession(SessionId);
+            }
         }
     }
 }

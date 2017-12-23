@@ -55,7 +55,7 @@ namespace RestartManager
             {
                 ApplicationType = ApplicationType.Console,
                 AppStatus = ApplicationStatus.Running,
-                bRestartable = true,
+                bRestartable = false,
                 strAppName = "ConsoleApp",
                 Process = new MockProcess(),
             },
@@ -162,16 +162,79 @@ namespace RestartManager
                 .Returns(error == NativeMethods.ERROR_SUCCESS ? NativeMethods.ERROR_MORE_DATA : error)
                 .Verifiable();
 
-            processesLength = processesLengthRequired;
-            Mock.Setup(x => x.GetProcesses(sessionId, out processesLengthRequired, ref processesLength, It.IsAny<RM_PROCESS_INFO[]>(), out rebootReason))
-                .OutCallback((int sessionId_, out int processesLengthRequired_, ref int processesLengt_, RM_PROCESS_INFO[] processes_, out RebootReason rebootReason_) =>
-                {
-                    processesLengthRequired_ = processesLengthRequired;
-                    rebootReason_ = rebootReason;
+            if (error == NativeMethods.ERROR_SUCCESS)
+            {
+                processesLength = processesLengthRequired;
+                Mock.Setup(x => x.GetProcesses(sessionId, out processesLengthRequired, ref processesLength, It.IsAny<RM_PROCESS_INFO[]>(), out rebootReason))
+                    .OutCallback((int sessionId_, out int processesLengthRequired_, ref int processesLengt_, RM_PROCESS_INFO[] processes_, out RebootReason rebootReason_) =>
+                    {
+                        processesLengthRequired_ = processesLengthRequired;
+                        rebootReason_ = rebootReason;
 
-                    processes.CopyTo(processes_, 0);
+                        processes.CopyTo(processes_, 0);
+                    })
+                    .Returns(NativeMethods.ERROR_SUCCESS)
+                    .Verifiable();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Mocks <see cref="IRestartManagerService.ShutdownProcesses(int, RM_SHUTDOWN_TYPE, RM_WRITE_STATUS_CALLBACK)"/>.
+        /// </summary>
+        /// <param name="sessionId">Optional session ID to end. The default is 0.</param>
+        /// <param name="force">Whether to force applications to shutdown if no response. The default is false.</param>
+        /// <param name="onlyRegistered">Whether to only shut down applications if registered with Restart Manager. The default is false.</param>
+        /// <param name="error">Optional error to return. The default is 0 (no error).</param>
+        /// <returns>The current instance for fluent calls.</returns>
+        public MockRestartManagerService ShutdownProcesses(int sessionId = DefaultSessionId, bool force = false, bool onlyRegistered = false, int error = NativeMethods.ERROR_SUCCESS)
+        {
+            RM_SHUTDOWN_TYPE shutdownType = 0;
+            if (force)
+            {
+                shutdownType |= RM_SHUTDOWN_TYPE.RmForceShutdown;
+            }
+
+            if (onlyRegistered)
+            {
+                shutdownType |= RM_SHUTDOWN_TYPE.RmShutdownOnlyRegistered;
+            }
+
+            Mock.Setup(x => x.ShutdownProcesses(sessionId, shutdownType, It.IsAny<RM_WRITE_STATUS_CALLBACK>()))
+                .Callback<int, RM_SHUTDOWN_TYPE, RM_WRITE_STATUS_CALLBACK>((sessionId_, shutdownType_, progress_) =>
+                {
+                    // TODO: Consider uses whatever was actually registered above, default or otherwise.
+                    for (int i = 0, length = DefaultProcesses.Length; i < length; ++i)
+                    {
+                        progress_?.Invoke(100 * i / length);
+                    }
                 })
-                .Returns(NativeMethods.ERROR_SUCCESS)
+                .Returns(error)
+                .Verifiable();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Mocks <see cref="IRestartManagerService.RestartProcesses(int, RM_WRITE_STATUS_CALLBACK)"/>.
+        /// </summary>
+        /// <param name="sessionId">Optional session ID to end. The default is 0.</param>
+        /// <param name="error">Optional error to return. The default is 0 (no error).</param>
+        /// <returns>The current instance for fluent calls.</returns>
+        public MockRestartManagerService RestartProcesses(int sessionId = DefaultSessionId, int error = NativeMethods.ERROR_SUCCESS)
+        {
+            Mock.Setup(x => x.RestartProcesses(sessionId, It.IsAny<RM_WRITE_STATUS_CALLBACK>()))
+                .Callback<int, RM_WRITE_STATUS_CALLBACK>((sessionId_, progress_) =>
+                {
+                    // TODO: Consider uses whatever was actually registered above, default or otherwise.
+                    var processes = DefaultProcesses.Where(process => process.bRestartable);
+                    for (int i = 0, length = processes.Count(); i < length; ++i)
+                    {
+                        progress_?.Invoke(100 * i / length);
+                    }
+                })
+                .Returns(error)
                 .Verifiable();
 
             return this;

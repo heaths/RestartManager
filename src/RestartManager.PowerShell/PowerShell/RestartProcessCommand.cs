@@ -12,14 +12,8 @@ namespace RestartManager.PowerShell
     /// The Restart-RestartManagerProcess cmdlet.
     /// </summary>
     [Cmdlet(VerbsLifecycle.Restart, Nouns.RestartManagerProcess)]
-    public class RestartProcessCommand : Cmdlet
+    public class RestartProcessCommand : SessionCommand
     {
-        /// <summary>
-        /// Gets or sets the <see cref="RestartManagerSession"/> with applications and services to restart.
-        /// </summary>
-        [Parameter(Mandatory = true, Position = 0)]
-        public RestartManagerSession Session { get; set; }
-
         /// <inheritdoc/>
         protected override void EndProcessing()
         {

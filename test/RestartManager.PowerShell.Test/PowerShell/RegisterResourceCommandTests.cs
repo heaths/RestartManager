@@ -5,6 +5,7 @@
 
 namespace RestartManager.PowerShell
 {
+    using System;
     using System.Diagnostics;
     using System.Management.Automation;
     using Moq;
@@ -29,7 +30,7 @@ namespace RestartManager.PowerShell
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 var sut = fixture.Create()
                     .AddCommand(CommandName);
@@ -46,22 +47,17 @@ namespace RestartManager.PowerShell
         {
             var path = typeof(RegisterResourceCommand).Assembly.Location;
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(files: new[] { path })
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
             {
-                using (fixture.SetServices(services))
-                {
-                    fixture.Create()
-                        .AddCommand(CommandName)
-                        .AddParameter("Path", path)
-                        .AddParameter("Session", session)
-                        .Invoke();
-                }
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Path", path)
+                    .AddParameter("Session", session)
+                    .Invoke();
             }
 
             services.Verify();
@@ -72,22 +68,17 @@ namespace RestartManager.PowerShell
         {
             var path = typeof(RegisterResourceCommand).Assembly.Location;
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(files: new[] { path })
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
             {
-                using (fixture.SetServices(services))
-                {
-                    fixture.Create()
-                        .AddCommand(CommandName)
-                        .AddArgument(path)
-                        .AddParameter("Session", session)
-                        .Invoke();
-                }
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddArgument(path)
+                    .AddParameter("Session", session)
+                    .Invoke();
             }
 
             services.Verify();
@@ -98,23 +89,18 @@ namespace RestartManager.PowerShell
         {
             var path = typeof(RegisterResourceCommand).Assembly.Location;
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(files: new[] { path })
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
             {
-                using (fixture.SetServices(services))
-                {
-                    fixture.Create()
-                        .AddCommand("Get-Item")
-                        .AddArgument(path)
-                        .AddCommand(CommandName)
-                        .AddParameter("Session", session)
-                        .Invoke();
-                }
+                fixture.Create()
+                    .AddCommand("Get-Item")
+                    .AddArgument(path)
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke();
             }
 
             services.Verify();
@@ -128,22 +114,17 @@ namespace RestartManager.PowerShell
             var uniqueProcess = new RM_UNIQUE_PROCESS(processInfo);
 
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(processes: new[] { uniqueProcess })
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
             {
-                using (fixture.SetServices(services))
-                {
-                    fixture.Create()
-                        .AddCommand(CommandName)
-                        .AddParameter("Process", process)
-                        .AddParameter("Session", session)
-                        .Invoke();
-                }
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Process", process)
+                    .AddParameter("Session", session)
+                    .Invoke();
             }
 
             services.Verify();
@@ -157,21 +138,120 @@ namespace RestartManager.PowerShell
             var uniqueProcess = new RM_UNIQUE_PROCESS(processInfo);
 
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(processes: new[] { uniqueProcess })
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
             {
-                using (fixture.SetServices(services))
-                {
-                    fixture.Create()
-                        .AddCommand(CommandName)
-                        .AddParameter("Session", session)
-                        .Invoke(new[] { process });
-                }
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke(new[] { process });
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void Register_Service_Parameter()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources(services: new[] { "ServiceApp" })
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("ServiceName", "ServiceApp")
+                    .AddParameter("Session", session)
+                    .Invoke();
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void Register_Service_Pipeline()
+        {
+            var service = new
+            {
+                ServiceName = "ServiceApp",
+            };
+
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources(services: new[] { "ServiceApp" })
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke(new[] { service });
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void Register_All_Parameter()
+        {
+            var path = typeof(RegisterResourceCommand).Assembly.Location;
+            var process = Process.GetCurrentProcess();
+            var processInfo = new ProcessAdapter(process);
+            var uniqueProcess = new RM_UNIQUE_PROCESS(processInfo);
+
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources(files: new[] { path }, processes: new[] { uniqueProcess }, services: new[] { "ServiceApp" })
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Path", path)
+                    .AddParameter("Process", process)
+                    .AddParameter("ServiceName", "ServiceApp")
+                    .AddParameter("Session", session)
+                    .Invoke();
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void Register_All_Pipeline()
+        {
+            var path = typeof(RegisterResourceCommand).Assembly.Location;
+            var file = new
+            {
+                Path = path,
+                LiteralPath = $@"Microsoft.PowerShell.Core\FileSystem::{path}",
+            };
+            var process = Process.GetCurrentProcess();
+            var processInfo = new ProcessAdapter(process);
+            var uniqueProcess = new RM_UNIQUE_PROCESS(processInfo);
+            var service = new
+            {
+                ServiceName = "ServiceApp",
+            };
+
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources(files: new[] { path }, processes: new[] { uniqueProcess }, services: new[] { "ServiceApp" })
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke(new object[] { file, process, service });
             }
 
             services.Verify();
@@ -182,16 +262,14 @@ namespace RestartManager.PowerShell
         {
             var path = typeof(RegisterResourceCommand).Assembly.Location;
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources(files: new[] { path })
-                    .EndSession()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue(SessionManager.VariableName, s => new RestartManagerSession(s))
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 fixture.Create()
                     .AddCommand(CommandName)
@@ -199,6 +277,29 @@ namespace RestartManager.PowerShell
                     .AddStatement()
                     .AddCommand("Stop-RestartManagerSession")
                     .Invoke();
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void OnError()
+        {
+            var path = typeof(RegisterResourceCommand).Assembly.Location;
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources(files: new[] { path }, error: NativeMethods.ERROR_OUTOFMEMORY)
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                var sut = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Path", path)
+                    .AddParameter("Session", session);
+
+                var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
+                Assert.IsType<OutOfMemoryException>(ex.InnerException);
             }
 
             services.Verify();

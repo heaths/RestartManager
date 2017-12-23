@@ -25,11 +25,9 @@ namespace RestartManager.PowerShell
         public void ProcessRecord_Throws()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources()
                     .GetProcesses(error: NativeMethods.ERROR_OUTOFMEMORY)
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
@@ -43,17 +41,17 @@ namespace RestartManager.PowerShell
                 var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
                 Assert.IsType<OutOfMemoryException>(ex.InnerException);
             }
+
+            services.Verify();
         }
 
         [Fact]
         public void ProcessRecord()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources()
                     .GetProcesses()
-                    .EndSession()
                     .Pop();
 
             using (var session = new RestartManagerSession(services))
@@ -68,6 +66,8 @@ namespace RestartManager.PowerShell
                 var expected = MockRestartManagerService.GetDefaultProcessesInfo(RebootReason.None);
                 Assert.Equal(expected, output, ProcessComparer.Default);
             }
+
+            services.Verify();
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace RestartManager.PowerShell
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 var sut = fixture.Create()
                     .AddCommand(CommandName);
@@ -86,17 +86,17 @@ namespace RestartManager.PowerShell
                 var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
                 Assert.IsType<NoSessionException>(ex.InnerException);
             }
+
+            services.Verify();
         }
 
         [Fact]
         public void Session_Variable()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+                .Push<IRestartManagerService>()
                     .RegisterResources()
                     .GetProcesses()
-                    .EndSession()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue(SessionManager.VariableName, s =>
@@ -108,7 +108,7 @@ namespace RestartManager.PowerShell
                     })
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 var output = fixture.Create()
                     .AddCommand(CommandName)
@@ -118,6 +118,31 @@ namespace RestartManager.PowerShell
 
                 var expected = MockRestartManagerService.GetDefaultProcessesInfo(RebootReason.None);
                 Assert.Equal(expected, output, ProcessComparer.Default);
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void OnError()
+        {
+            var path = typeof(GetProcessCommand).Assembly.Location;
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .RegisterResources()
+                    .GetProcesses(error: NativeMethods.ERROR_OUTOFMEMORY)
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                session.RegisterResources(files: new[] { path });
+
+                var sut = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session);
+
+                var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
+                Assert.IsType<OutOfMemoryException>(ex.InnerException);
             }
 
             services.Verify();

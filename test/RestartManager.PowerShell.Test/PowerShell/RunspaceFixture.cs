@@ -69,7 +69,7 @@ namespace RestartManager.PowerShell
         /// </summary>
         /// <param name="services">The <see cref="RestartManager.IServiceProvider"/> to set on the <see cref="TestableHost"/>.</param>
         /// <returns>An <see cref="IDisposable"/> object that will unset the <paramref name="services"/> when disposed.</returns>
-        internal IDisposable SetServices(RestartManager.IServiceProvider services)
+        internal IDisposable UseServices(RestartManager.IServiceProvider services)
         {
             return new ServiceScope(host, services);
         }

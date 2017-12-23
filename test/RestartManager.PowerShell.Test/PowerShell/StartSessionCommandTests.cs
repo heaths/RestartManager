@@ -26,15 +26,13 @@ namespace RestartManager.PowerShell
         public void Creates_Session_Throws()
         {
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession(error: NativeMethods.ERROR_OUTOFMEMORY)
-                    .EndSession()
+                .Push<IRestartManagerService>(error: NativeMethods.ERROR_OUTOFMEMORY)
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 var sut = fixture.Create()
                     .AddCommand(CommandName)
@@ -43,20 +41,22 @@ namespace RestartManager.PowerShell
                 var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
                 Assert.IsType<OutOfMemoryException>(ex.InnerException);
             }
+
+            services.Verify();
         }
 
         [Fact]
         public void Creates_Session()
         {
-            var services = new MockContainer()
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue<RestartManagerSession>(SessionManager.VariableName, () => null)
+                    .SetValue<RestartManagerSession>(SessionManager.VariableName)
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 var sut = fixture.Create()
                     .AddCommand(CommandName)
@@ -70,6 +70,8 @@ namespace RestartManager.PowerShell
                     services.Verify<IVariableService>(x => x.SetValue(SessionManager.VariableName, session));
                 }
             }
+
+            services.Verify();
         }
 
         [Fact]
@@ -77,15 +79,13 @@ namespace RestartManager.PowerShell
         {
             RestartManagerSession session = null;
             var services = new MockContainer(MockBehavior.Strict)
-                .Push<IRestartManagerService, MockRestartManagerService>()
-                    .StartSession()
-                    .EndSession()
+                .Push<IRestartManagerService>()
                     .Pop()
                 .Push<IVariableService, MockVariableService>()
                     .GetValue(SessionManager.VariableName, s => session = new RestartManagerSession(s))
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 using (session)
                 {
@@ -97,6 +97,8 @@ namespace RestartManager.PowerShell
                     Assert.IsType<ActiveSessionException>(ex.InnerException);
                 }
             }
+
+            services.Verify();
         }
 
         [Fact]
@@ -111,7 +113,7 @@ namespace RestartManager.PowerShell
                     .GetValue(SessionManager.VariableName, s => original = new RestartManagerSession(s))
                     .Pop();
 
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 using (original)
                 {
@@ -130,6 +132,8 @@ namespace RestartManager.PowerShell
                     }
                 }
             }
+
+            services.Verify();
         }
 
         [Fact]
@@ -145,7 +149,7 @@ namespace RestartManager.PowerShell
                     .Pop();
 
             original.Dispose();
-            using (fixture.SetServices(services))
+            using (fixture.UseServices(services))
             {
                 using (original)
                 {
@@ -163,6 +167,8 @@ namespace RestartManager.PowerShell
                     }
                 }
             }
+
+            services.Verify();
         }
     }
 }

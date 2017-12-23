@@ -12,14 +12,8 @@ namespace RestartManager.PowerShell
     /// The Stop-RestartManagerProcess cmdlet.
     /// </summary>
     [Cmdlet(VerbsLifecycle.Stop, Nouns.RestartManagerProcess)]
-    public class StopProcessCommand : Cmdlet
+    public class StopProcessCommand : SessionCommand
     {
-        /// <summary>
-        /// Gets or sets the <see cref="RestartManagerSession"/> with applications and services to stop.
-        /// </summary>
-        [Parameter(Mandatory = true, Position = 0)]
-        public RestartManagerSession Session { get; set; }
-
         /// <summary>
         /// Gets or sets a value indicating whether to force applications and services to shut down.
         /// </summary>

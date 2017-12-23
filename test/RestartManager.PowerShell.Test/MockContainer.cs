@@ -30,12 +30,12 @@ namespace RestartManager
         /// <summary>
         /// Gets the underlying <see cref="IServiceProvider"/>.
         /// </summary>
-        internal IServiceProvider Object => mocks.Object;
+        public IServiceProvider Object => mocks.Object;
 
         /// <summary>
         /// Gets the <see cref="MockRepository"/> used to create mocks.
         /// </summary>
-        internal MockRepository Repository => repo;
+        public MockRepository Repository => repo;
 
         /// <inheritdoc/>
         public TService GetService<TService>(bool throwIfNotDefined = false)
@@ -50,11 +50,28 @@ namespace RestartManager
         /// <typeparam name="TService">The type of service to mock.</typeparam>
         /// <typeparam name="TMock">The <see cref="MockService{TService}"/> implementing the <typeparamref name="TService"/> to push.</typeparam>
         /// <returns>A <see cref="MockService{TService}"/> implementing <typeparamref name="TService"/>.</returns>
-        internal TMock Push<TService, TMock>()
+        public TMock Push<TService, TMock>()
             where TService : class
             where TMock : MockService<TService>, TService
         {
             var mock = MockServiceFactory.Create<TService, TMock>(this);
+            AddService(mock.Object);
+
+            return mock;
+        }
+
+        /// <summary>
+        /// Pushes a new <see cref="MockRestartManagerService"/> scope.
+        /// </summary>
+        /// <typeparam name="TService">A <see cref="IRestartManagerService"/> to mock.</typeparam>
+        /// <param name="sessionId">Optional session ID to return. The default is 0.</param>
+        /// <param name="sessionKey">Optional session key to return. The default is "123abc".</param>
+        /// <param name="error">Optional error to return. The default is 0 (no error).</param>
+        /// <returns>A <see cref="MockRestartManagerService"/> implementing <typeparamref name="TService"/>.</returns>
+        public MockRestartManagerService Push<TService>(int sessionId = MockRestartManagerService.DefaultSessionId, string sessionKey = MockRestartManagerService.DefaultSessionKey, int error = NativeMethods.ERROR_SUCCESS)
+            where TService : IRestartManagerService
+        {
+            var mock = MockServiceFactory.Create<TService>(this, sessionId, sessionKey, error);
             AddService(mock.Object);
 
             return mock;
@@ -66,7 +83,7 @@ namespace RestartManager
         /// <typeparam name="TService">The type of service being mocked.</typeparam>
         /// <returns>A <see cref="Mock{T}"/> for the <typeparamref name="TService"/> service interface.</returns>
         /// <exception cref="NotImplementedException"><typeparamref name="TService"/> is not mocked.</exception>
-        internal Mock<TService> Get<TService>()
+        public Mock<TService> Get<TService>()
             where TService : class
         {
             var service = Object.GetService<TService>();

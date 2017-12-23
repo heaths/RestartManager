@@ -25,5 +25,28 @@ namespace RestartManager
         {
             return Activator.CreateInstance(typeof(TMock), container) as TMock;
         }
+
+        /// <summary>
+        /// Creates instance of <see cref="MockRestartManagerService"/>.
+        /// </summary>
+        /// <typeparam name="TService">The type of <see cref="IRestartManagerService"/> service to mock.</typeparam>
+        /// <param name="container">The parent <see cref="MockContainer"/> to which mocks are added.</param>
+        /// <param name="sessionId">Optional session ID to return. The default is 0.</param>
+        /// <param name="sessionKey">Optional session key to return. The default is "123abc".</param>
+        /// <param name="error">Optional error to return. The default is 0 (no error).</param>
+        /// <returns>A <see cref="MockRestartManagerService"/>.</returns>
+        public static MockRestartManagerService Create<TService>(MockContainer container, int sessionId = MockRestartManagerService.DefaultSessionId, string sessionKey = MockRestartManagerService.DefaultSessionKey, int error = NativeMethods.ERROR_SUCCESS)
+            where TService : IRestartManagerService
+        {
+            var mock = new MockRestartManagerService(container)
+                .StartSession(sessionId, sessionKey, error);
+
+            if (error == NativeMethods.ERROR_SUCCESS)
+            {
+                mock.EndSession(sessionId);
+            }
+
+            return mock;
+        }
     }
 }
