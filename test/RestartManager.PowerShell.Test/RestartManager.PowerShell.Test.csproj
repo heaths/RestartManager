@@ -88,6 +88,8 @@
     <Compile Include="PowerShell\RunspaceCollection.cs" />
     <Compile Include="PowerShell\RunspaceException.cs" />
     <Compile Include="PowerShell\RunspaceFixture.cs" />
+    <Compile Include="PowerShell\RunspaceVariableServiceTests.cs" />
+    <Compile Include="PowerShell\SessionManagerTests.cs" />
     <Compile Include="PowerShell\StartSessionCommandTests.cs" />
     <Compile Include="PowerShell\StopProcessCommandTests.cs" />
     <Compile Include="PowerShell\StopSessionCommandTests.cs" />

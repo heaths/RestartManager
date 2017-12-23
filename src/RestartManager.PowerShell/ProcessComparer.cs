@@ -7,6 +7,7 @@ namespace RestartManager
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Compares <see cref="IProcessInfo"/> objects.
@@ -92,6 +93,7 @@ namespace RestartManager
         }
 
         /// <inheritdoc/>
+        [ExcludeFromCodeCoverage]
         public int GetHashCode(IProcessInfo obj)
         {
             if (obj is null)

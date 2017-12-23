@@ -50,17 +50,22 @@ namespace RestartManager
                 new object[] { f, g, false, false },
             };
 
-            object[] Swap(object[] obj, int x, int y)
+            object[] Swap(object[] input, int x, int y)
             {
-                var z = obj[x];
-                obj[x] = obj[y];
-                obj[y] = z;
+                // Shallow clone is fine since elements are not changed.
+                var output = (object[])input.Clone();
 
-                return obj;
+                var z = output[x];
+                output[x] = output[y];
+                output[y] = z;
+
+                return output;
             }
 
-            return data
-                .Union(data.Select(elem => Swap(elem, 0, 1)));
+            var swapped = data
+                .Where(elem => !ReferenceEquals(elem[0], elem[1]))
+                .Select(elem => Swap(elem, 0, 1));
+            return data.Union(swapped);
         }
 
         [Theory]

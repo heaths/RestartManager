@@ -5,7 +5,6 @@
 
 namespace RestartManager.PowerShell
 {
-    using System;
     using System.Management.Automation;
     using System.Management.Automation.Runspaces;
     using RestartManager;
@@ -23,52 +22,14 @@ namespace RestartManager.PowerShell
         /// <summary>
         /// Gets a <see cref="RestartManagerSession"/> from a variable.
         /// </summary>
-        /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
-        /// <returns>A <see cref="RestartManagerSession"/> from a variable or null if no session is available.</returns>
-        public static RestartManagerSession GetVariable(PSVariableIntrinsics variables) =>
-            GetVariable(null, variables);
-
-        /// <summary>
-        /// Gets a <see cref="RestartManagerSession"/> from a variable.
-        /// </summary>
         /// <param name="services">Optional services to use to resolve variables.</param>
         /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
         /// <returns>A <see cref="RestartManagerSession"/> from a variable or null if no session is available.</returns>
-        public static RestartManagerSession GetVariable(RestartManager.IServiceProvider services, PSVariableIntrinsics variables)
+        public static RestartManagerSession GetVariable(IServiceProvider services, PSVariableIntrinsics variables)
         {
             var resolver = services?.GetService<IVariableService>() ?? new RunspaceVariableService(variables);
             return resolver.GetValue<RestartManagerSession>(VariableName);
         }
-
-        /// <summary>
-        /// Sets the <see cref="RestartManagerSession"/> session variable.
-        /// </summary>
-        /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
-        /// <param name="session">The <see cref="RestartManagerSession"/> to set.</param>
-        public static void SetVariable(PSVariableIntrinsics variables, RestartManagerSession session) =>
-            SetVariable(null, variables, session);
-
-        /// <summary>
-        /// Sets the <see cref="RestartManagerSession"/> session variable.
-        /// </summary>
-        /// <param name="services">Optional services to use to resolve variables.</param>
-        /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
-        /// <param name="session">The <see cref="RestartManagerSession"/> to set.</param>
-        public static void SetVariable(RestartManager.IServiceProvider services, PSVariableIntrinsics variables, RestartManagerSession session)
-        {
-            var resolver = services?.GetService<IVariableService>() ?? new RunspaceVariableService(variables);
-            resolver.SetValue(VariableName, session);
-        }
-
-        /// <summary>
-        /// Gets a <see cref="RestartManagerSession"/> from a parameter or from a variable.
-        /// </summary>
-        /// <param name="session">A backing field for a parameter that may reference a <see cref="RestartManagerSession"/>.</param>
-        /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
-        /// <returns>A <see cref="RestartManagerSession"/> from a parameter or from a variable.</returns>
-        /// <exception cref="InvalidOperationException">No <see cref="RestartManagerSession"/> is available.</exception>
-        public static RestartManagerSession GetParameterOrVariable(ref RestartManagerSession session, PSVariableIntrinsics variables) =>
-            GetParameterOrVariable(session?.Services, ref session, variables);
 
         /// <summary>
         /// Gets a <see cref="RestartManagerSession"/> from a parameter or from a variable.
@@ -78,7 +39,7 @@ namespace RestartManager.PowerShell
         /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
         /// <returns>A <see cref="RestartManagerSession"/> from a parameter or from a variable.</returns>
         /// <exception cref="NoSessionException">No <see cref="RestartManagerSession"/> is available.</exception>
-        public static RestartManagerSession GetParameterOrVariable(RestartManager.IServiceProvider services, ref RestartManagerSession session, PSVariableIntrinsics variables)
+        public static RestartManagerSession GetParameterOrVariable(IServiceProvider services, ref RestartManagerSession session, PSVariableIntrinsics variables)
         {
             if (session == null)
             {
@@ -87,6 +48,18 @@ namespace RestartManager.PowerShell
             }
 
             return session ?? throw new NoSessionException();
+        }
+
+        /// <summary>
+        /// Sets the <see cref="RestartManagerSession"/> session variable.
+        /// </summary>
+        /// <param name="services">Optional services to use to resolve variables.</param>
+        /// <param name="variables">Variables for the current <see cref="Runspace"/>.</param>
+        /// <param name="session">The <see cref="RestartManagerSession"/> to set.</param>
+        public static void SetVariable(IServiceProvider services, PSVariableIntrinsics variables, RestartManagerSession session)
+        {
+            var resolver = services?.GetService<IVariableService>() ?? new RunspaceVariableService(variables);
+            resolver.SetValue(VariableName, session);
         }
     }
 }

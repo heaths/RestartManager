@@ -9,6 +9,7 @@ namespace RestartManager.PowerShell
     using System.Diagnostics;
     using System.Management.Automation;
     using Moq;
+    using RestartManager.Properties;
     using Xunit;
 
     [Collection(RunspaceCollection.DefinitionName)]
@@ -300,6 +301,30 @@ namespace RestartManager.PowerShell
 
                 var ex = Assert.Throws<CmdletInvocationException>(() => sut.Invoke());
                 Assert.IsType<OutOfMemoryException>(ex.InnerException);
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void NonFile_Path_Warns()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                var sut = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("PSPath", @"Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\Software")
+                    .AddParameter("Session", session);
+
+                var output = sut.Invoke();
+                Assert.Empty(output);
+
+                var warnings = sut.Streams.Warning;
+                Assert.Collection(warnings, x => Assert.Equal(Resources.Warning_NoFiles, x.Message));
             }
 
             services.Verify();

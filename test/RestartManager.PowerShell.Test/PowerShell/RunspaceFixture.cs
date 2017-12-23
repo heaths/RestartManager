@@ -34,6 +34,11 @@ namespace RestartManager.PowerShell
         }
 
         /// <summary>
+        /// Gets variables for the runspace.
+        /// </summary>
+        public PSVariableIntrinsics Variables => runspace.SessionStateProxy.PSVariable;
+
+        /// <summary>
         /// Creates a new <see cref="PowerShell"/> instance.
         /// </summary>
         /// <param name="throwOnError">Throw <see cref="RunspaceException"/>if error is written to pipeline.</param>

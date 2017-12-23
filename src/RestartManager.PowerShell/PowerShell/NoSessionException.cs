@@ -6,6 +6,7 @@
 namespace RestartManager.PowerShell
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Management.Automation;
     using System.Runtime.Serialization;
     using System.Threading;
@@ -33,6 +34,7 @@ namespace RestartManager.PowerShell
         /// </summary>
         /// <param name="info">A <see cref="SerializationInfo"/> into which objects are serialized.</param>
         /// <param name="context"><see cref="StreamingContext"/> that describes the underlying stream context.</param>
+        [ExcludeFromCodeCoverage]
         protected NoSessionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -51,6 +53,7 @@ namespace RestartManager.PowerShell
         });
 
         /// <inheritdoc/>
+        [ExcludeFromCodeCoverage]
         public override void GetObjectData(SerializationInfo info, StreamingContext context) =>
             base.GetObjectData(info, context);
     }

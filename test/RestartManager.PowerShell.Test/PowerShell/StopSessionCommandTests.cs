@@ -5,6 +5,7 @@
 
 namespace RestartManager.PowerShell
 {
+    using System;
     using Moq;
     using Xunit;
 
@@ -89,6 +90,30 @@ namespace RestartManager.PowerShell
             {
                 fixture.Create()
                     .AddCommand(CommandName)
+                    .Invoke();
+            }
+
+            services.Verify();
+        }
+
+        [Fact]
+        public void EndSession_Throws()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService, MockRestartManagerService>()
+                    .StartSession()
+                    .Pop();
+
+            var restartManagerServiceMock = services.Get<IRestartManagerService>();
+            restartManagerServiceMock.Setup(x => x.EndSession(0))
+                .Throws(new ObjectDisposedException(nameof(RestartManagerSession)))
+                .Verifiable();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
                     .Invoke();
             }
 

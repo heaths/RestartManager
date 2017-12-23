@@ -43,5 +43,30 @@ namespace RestartManager
             Assert.Equal("TestService", sut.ServiceName);
             Assert.Equal(DateTimeOffset.FromFileTime(131579267020668954), sut.StartTime);
         }
+
+        [Fact]
+        public void IsEqual()
+        {
+            var info = new RM_PROCESS_INFO
+            {
+                Process = new RM_UNIQUE_PROCESS
+                {
+                    dwProcessId = 0,
+                },
+                ApplicationType = ApplicationType.MainWindow,
+                bRestartable = true,
+            };
+
+            var a = new ProcessInfo(info, RebootReason.None);
+
+            info.ApplicationType = ApplicationType.Console;
+            info.bRestartable = false;
+
+            var b = new ProcessInfo(info, RebootReason.PermissionDenied);
+
+            Assert.True(a.Equals(a));
+            Assert.False(a.Equals(b));
+            Assert.False(b.Equals(a));
+        }
     }
 }
