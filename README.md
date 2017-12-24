@@ -4,6 +4,8 @@ This module exposes Windows Restart Manager APIs through PowerShell cmdlets for 
 
 [![master](https://ci.appveyor.com/api/projects/status/8hxomqwhptoip5ja/branch/master?svg=true)](https://ci.appveyor.com/project/heaths/restartmanager/branch/master)
 [![codecov](https://codecov.io/gh/heaths/RestartManager/branch/master/graph/badge.svg)](https://codecov.io/gh/heaths/RestartManager)
+[![release](https://img.shields.io/github/release/heaths/RestartManager.svg)](https://github.com/heaths/RestartManager/releases/latest)
+[![psgallery](https://img.shields.io/powershellgallery/dt/RestartManager.svg)](https://www.powershellgallery.com/packages/RestartManager)
 
 ## Examples
 
