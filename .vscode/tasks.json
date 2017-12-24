@@ -6,6 +6,7 @@
             "type": "shell",
             "command": "msbuild",
             "args": [
+                "/property:DebugType=portable"
                 "/property:GenerateFullPaths=true",
                 "/t:build"
             ],

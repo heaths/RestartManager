@@ -34,6 +34,7 @@ before_build:
   - ps: New-ExternalHelp -Path "${env:APPVEYOR_BUILD_FOLDER}\docs" -OutputPath "${env:APPVEYOR_BUILD_FOLDER}\src\RestartManager.PowerShell\bin\${env:CONFIGURATION}" -Force
 
 build:
+  project: RestartManager.sln
   parallel: true
 
 after_build:
@@ -44,10 +45,10 @@ after_build:
       7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\RestartManager*.dll-Help.xml"
       7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\about_RestartManager.help.txt"
 
-test:
-  assemblies:
-    only:
-      - test\**\bin\$(configuration)\*.test.dll
+test_script:
+  - ps: |
+      tools\test.ps1 -verbose
+      packages\Codecov.1.0.3\tools\codecov.exe -f "bin\${env:CONFIGURATION}\RestartManager.coverage.xml"
 
 artifacts:
   - path: bin\$(configuration)\*.nupkg
