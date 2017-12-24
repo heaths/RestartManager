@@ -3,6 +3,7 @@
 This module exposes Windows Restart Manager APIs through PowerShell cmdlets for testing applications' compatibility with Windows Restart Manager and for basic scripted installs.
 
 [![master](https://ci.appveyor.com/api/projects/status/8hxomqwhptoip5ja/branch/master?svg=true)](https://ci.appveyor.com/project/heaths/restartmanager/branch/master)
+[![codecov](https://codecov.io/gh/heaths/RestartManager/branch/master/graph/badge.svg)](https://codecov.io/gh/heaths/RestartManager)
 
 ## Examples
 

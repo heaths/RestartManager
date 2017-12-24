@@ -8,6 +8,7 @@ namespace RestartManager
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Moq;
     using Xunit;
 
     public class ProcessComparerTests
@@ -35,7 +36,17 @@ namespace RestartManager
             info.strAppName = info.strAppName.ToUpperInvariant();
             var f = new ProcessInfo(info, RebootReason.None);
 
-            var g = new ProcessInfo(info, RebootReason.PermissionDenied);
+            info.bRestartable = false;
+            var g = new ProcessInfo(info, RebootReason.None);
+
+            info.strServiceShortName = "Other";
+            var h = new ProcessInfo(info, RebootReason.None);
+
+            var process = Mock.Of<IProcess>(x => x.Id == 1234 && x.StartTime == new DateTime(2017, 11, 25, 17, 55, 00, 00, DateTimeKind.Local));
+            info.Process = new RM_UNIQUE_PROCESS(process);
+            var i = new ProcessInfo(info, RebootReason.None);
+
+            var j = new ProcessInfo(info, RebootReason.PermissionDenied);
 
             var data = new[]
             {
@@ -48,6 +59,9 @@ namespace RestartManager
                 new object[] { d, e, false, false },
                 new object[] { e, f, true, false },
                 new object[] { f, g, false, false },
+                new object[] { g, h, false, false },
+                new object[] { h, i, false, false },
+                new object[] { i, j, false, false },
             };
 
             object[] Swap(object[] input, int x, int y)

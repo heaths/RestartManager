@@ -7,10 +7,31 @@ namespace RestartManager
 {
     using System;
     using System.Collections.Generic;
+    using System.Management.Automation.Host;
+    using RestartManager.PowerShell;
     using Xunit;
 
     public class ExtensionsTests
     {
+        [Fact]
+        public void GetServices_Testable()
+        {
+            var services = new MockContainer();
+            var host = new TestableHost
+            {
+                Services = services,
+            };
+
+            Assert.Same(services, host.GetServices());
+        }
+
+        [Fact]
+        public void GetServices_Null()
+        {
+            PSHost host = null;
+            Assert.Null(host.GetServices());
+        }
+
         [Fact]
         public void NullOrEmpty_Null()
         {

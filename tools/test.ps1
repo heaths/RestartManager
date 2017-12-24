@@ -33,4 +33,10 @@ if ($VerbosePreference -eq 'Continue') {
     $targetargs += ' -verbose'
 }
 
-& "$solutionDir\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:"$solutionDir\packages\xunit.runner.console.2.3.1\tools\net452\xunit.console.exe" -targetargs:"$targetargs" -filter:"+[RestartManager*]* -[RestartManager*.Test]*" -excludebyattribute:"*.ExcludeFromCodeCoverage*" -output:"$outDir\RestartManager.coverage.xml"
+[string[]] $filter = @(
+    '+[RestartManager*]*'
+    '-[RestartManager*]*.Properties.Resources'
+    '-[RestartManager*.Test]*'
+)
+
+& "$solutionDir\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:"$solutionDir\packages\xunit.runner.console.2.3.1\tools\net452\xunit.console.exe" -targetargs:"$targetargs" -filter:"$filter" -excludebyattribute:"*.ExcludeFromCodeCoverage*" -output:"$outDir\RestartManager.coverage.xml"

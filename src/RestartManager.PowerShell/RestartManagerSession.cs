@@ -79,12 +79,6 @@ namespace RestartManager
         /// </summary>
         public bool IsRegistered { get; private set; }
 
-        /// <summary>
-        /// Gets the <see cref="IServiceProvider"/> used to create this session.
-        /// </summary>
-        /// <value>May be null if a real session was created.</value>
-        internal IServiceProvider Services => services;
-
         private IRestartManagerService RestartManagerService =>
             services.GetService(ref restartManagerService, () => WindowsRestartManagerService.Default);
 
