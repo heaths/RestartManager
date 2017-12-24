@@ -29,6 +29,8 @@
     <file src="bin\$Configuration$\RestartManager.psd1"/>
     <file src="bin\$Configuration$\RestartManager*.dll"/>
     <file src="bin\$Configuration$\RestartManager*.pdb"/>
+    <file src="bin\$Configuration$\*.dll-Help.xml" />
+    <file src="bin\$Configuration$\about_*.help.txt" />
     <file src="..\..\LICENSE.txt"/>
   </files>
 </package>

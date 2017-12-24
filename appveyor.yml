@@ -25,6 +25,13 @@ cache:
 
 install:
   - nuget restore
+  - ps: |
+    $ErrorActionPreference = 'Stop'
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Install-Module -Name platyPS -Repository PSGallery -SkipPublisherCheck -Force
+
+before_build:
+  - ps: New-ExternalHelp -Path "${env:APPVEYOR_BUILD_FOLDER}\docs" -OutputPath "${env:APPVEYOR_BUILD_FOLDER}\src\RestartManager.PowerShell\bin\${env:CONFIGURATION}" -Force
 
 build:
   parallel: true
