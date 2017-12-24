@@ -26,9 +26,9 @@ cache:
 install:
   - nuget restore
   - ps: |
-    $ErrorActionPreference = 'Stop'
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Install-Module -Name platyPS -Repository PSGallery -SkipPublisherCheck -Force
+      $ErrorActionPreference = 'Stop'
+      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+      Install-Module -Name platyPS -Repository PSGallery -SkipPublisherCheck -Force
 
 before_build:
   - ps: New-ExternalHelp -Path "${env:APPVEYOR_BUILD_FOLDER}\docs" -OutputPath "${env:APPVEYOR_BUILD_FOLDER}\src\RestartManager.PowerShell\bin\${env:CONFIGURATION}" -Force
@@ -38,6 +38,11 @@ build:
 
 after_build:
   - nuget pack src\RestartManager.PowerShell\RestartManager.nuspec -OutputDirectory bin\%configuration% -Version %GitPackageVersion% -Symbols -NoPackageAnalysis -Properties "Configuration=%configuration%;CommitId=%APPVEYOR_REPO_COMMIT%"
+  - cmd: |
+      7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\RestartManager.ps*"
+      7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\RestartManager*.dll"
+      7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\RestartManager*.dll-Help.xml"
+      7z a "bin\%CONFIGURATION%\RestartManager.zip" "%APPVEYOR_BUILD_FOLDER%\src\RestartManager.PowerShell\bin\%CONFIGURATION%\about_RestartManager.help.txt"
 
 test:
   assemblies:
@@ -46,14 +51,34 @@ test:
 
 artifacts:
   - path: bin\$(configuration)\*.nupkg
-  - path: src\RestartManager.PowerShell\bin\$(configuration)
+    name: packages
+
+  - path: bin\$(configuration)\RestartManager.zip
     name: RestartManager
-    type: zip
 
 nuget:
   project_feed: true
 
 deploy:
+  - provider: GitHub
+    description: Release version $(appveyor_build_version)
+    auth_token:
+      secure: 5K94QY8dHKlbjvlBpQaXwAkmDf+LQE3g5WlU9snnNMjDjf0UT4xDoOBCLWcmwZOm
+    artifact: RestartManager
+    on:
+      branch: master
+      configuration: Release
+
+  - provider: GitHub
+    description: Prerelease version $(appveyor_build_version)
+    prerelease: true
+    auth_token:
+      secure: 5K94QY8dHKlbjvlBpQaXwAkmDf+LQE3g5WlU9snnNMjDjf0UT4xDoOBCLWcmwZOm
+    artifact: RestartManager
+    on:
+      branch: develop
+      configuration: Release
+
   - provider: NuGet
     symbol_server: https://ci.appveyor.com/nuget/heaths
     api_key:
