@@ -147,5 +147,25 @@ namespace RestartManager.PowerShell
 
             services.Verify();
         }
+
+        [Fact]
+        public void None_Registered()
+        {
+            var services = new MockContainer(MockBehavior.Strict)
+                .Push<IRestartManagerService>()
+                    .Pop();
+
+            using (var session = new RestartManagerSession(services))
+            {
+                var output = fixture.Create()
+                    .AddCommand(CommandName)
+                    .AddParameter("Session", session)
+                    .Invoke<IProcessInfo>();
+
+                Assert.Empty(output);
+            }
+
+            services.Verify();
+        }
     }
 }

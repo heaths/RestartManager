@@ -42,7 +42,7 @@ namespace RestartManager
             info.strServiceShortName = "Other";
             var h = new ProcessInfo(info, RebootReason.None);
 
-            var process = Mock.Of<IProcess>(x => x.Id == 1234 && x.StartTime == new DateTime(2017, 11, 25, 17, 55, 00, 00, DateTimeKind.Local));
+            var process = Mock.Of<IProcess>(x => x.Id == info.Process.dwProcessId && x.StartTime == new DateTime(2017, 11, 25, 17, 55, 00, 00, DateTimeKind.Local));
             info.Process = new RM_UNIQUE_PROCESS(process);
             var i = new ProcessInfo(info, RebootReason.None);
 
