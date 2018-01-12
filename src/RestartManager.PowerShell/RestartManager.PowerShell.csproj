@@ -1,129 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DFB42013-4B85-4348-BA11-DA3F733C5396}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RestartManager</RootNamespace>
-    <AssemblyName>RestartManager.PowerShell</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType Condition="'$(DebugType)'==''">full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\RestartManager.PowerShell.xml</DocumentationFile>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <TargetFramework>net46</TargetFramework>
+    <Company>Heath Stewart</Company>
+    <Copyright>Copyright (c) 2017 Heath Stewart</Copyright>
+    <Product>Windows Restart Manager Module</Product>
+    <Description>PowerShell Module for Windows Restart Manager</Description>
+    <AssemblyTitle>Windows Restart Manager PowerShell Module</AssemblyTitle>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CodeAnalysisRuleSet>..\..\inc\Common.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\RestartManager.PowerShell.xml</DocumentationFile>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\..\inc\Common.ruleset</CodeAnalysisRuleSet>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.PowerShell.3.ReferenceAssemblies.1.0.0\lib\net4\System.Management.Automation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.PowerShell.3.ReferenceAssemblies" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" />
+    <PackageReference Include="RoslynCodeTaskFactory" Version="1.2.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ApplicationStatus.cs" />
-    <Compile Include="ApplicationType.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="IProcess.cs" />
-    <Compile Include="IProcessInfo.cs" />
-    <Compile Include="IRestartManagerService.cs" />
-    <Compile Include="IServiceContainer.cs" />
-    <Compile Include="IServiceProvider.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="PowerShell\ActiveSessionException.cs" />
-    <Compile Include="PowerShell\Extensions.cs" />
-    <Compile Include="PowerShell\GetProcessCommand.cs" />
-    <Compile Include="PowerShell\ITestableHost.cs" />
-    <Compile Include="PowerShell\IVariableService.cs" />
-    <Compile Include="PowerShell\NoSessionException.cs" />
-    <Compile Include="PowerShell\Nouns.cs" />
-    <Compile Include="PowerShell\RegisterResourceCommand.cs" />
-    <Compile Include="PowerShell\RunspaceVariableService.cs" />
-    <Compile Include="PowerShell\SessionCommand.cs" />
-    <Compile Include="PowerShell\SessionManager.cs" />
-    <Compile Include="PowerShell\StopProcessCommand.cs" />
-    <Compile Include="PowerShell\RestartProcessCommand.cs" />
-    <Compile Include="PowerShell\StopSessionCommand.cs" />
-    <Compile Include="PowerShell\StartSessionCommand.cs" />
-    <Compile Include="ProcessAdapter.cs" />
-    <Compile Include="ProcessComparer.cs" />
-    <Compile Include="ProcessInfo.cs" />
-    <Compile Include="ProgressEventArgs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RebootReason.cs" />
-    <Compile Include="WindowsRestartManagerService.cs" />
-    <Compile Include="RestartManagerSession.cs" />
-    <Compile Include="ServiceContainer.cs" />
-    <Compile Include="Validate.cs" />
-  </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <AdditionalFiles Include="..\..\inc\stylecop.json">
       <Link>stylecop.json</Link>
       <Visible>False</Visible>
     </AdditionalFiles>
-    <None Include="packages.config" />
-    <None Include="RestartManager.nuspec" />
     <Template Include="RestartManager.psd1" />
   </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\inc\Transform.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.0.41\build\Nerdbank.GitVersioning.targets'))" />
-  </Target>
   <Target Name="SetAdditionalCloudBuildVars" DependsOnTargets="GetBuildVersion" BeforeTargets="SetCloudBuildVersionVars">
     <ItemGroup>
       <CloudBuildVersionVars Include="GitPackageVersion">

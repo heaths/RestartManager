@@ -17,16 +17,17 @@ See the LICENSE.txt file in the project root for more information.
     <AvailableItemName Include="Template" />
   </ItemGroup>
 
-  <UsingTask TaskName="ReplaceToken" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="ReplaceToken" TaskFactory="CodeTaskFactory" AssemblyFile="$(RoslynCodeTaskFactory)" Condition="'$(RoslynCodeTaskFactory)'!=''">
     <ParameterGroup>
       <InputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
       <OutputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
     </ParameterGroup>
     <Task>
-      <Reference Include="System.Core" />
+      <Reference Include="System.IO" />
+      <Reference Include="System.Runtime.Extensions" />
+      <Reference Include="System.Text.Encoding" />
       <Reference Include="$(MSBuildToolsPath)\Microsoft.Build.Utilities.Core.dll" />
       <Using Namespace="System" />
-      <Using Namespace="System.IO" />
       <Using Namespace="System.Text" />
       <Using Namespace="Microsoft.Build.Utilities" />
       <Code Type="Fragment" Language="C#">
