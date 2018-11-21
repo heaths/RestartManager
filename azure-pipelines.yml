@@ -1,0 +1,111 @@
+trigger:
+- master
+- develop
+
+pr:
+- master
+- develop
+
+variables:
+  BuildConfiguration: Release
+  BuildPlatform: Any CPU
+
+jobs:
+- job: Build
+  pool:
+    vmImage: vs2017-win2016
+
+  steps:
+  - checkout: self
+    clean: true
+    lfs: true
+
+  - task: VisualStudioTestPlatformInstaller@1
+    displayName: Install VSTest
+
+  - task: NuGetCommand@2
+    displayName: Restore packages
+
+  - powershell: |
+      $ErrorActionPreference = 'Stop'
+      $VerbosePreference = 'Continue'
+      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+      Install-Module -Name platyPS -Repository PSGallery -SkipPublisherCheck -Force
+      New-ExternalHelp -Path "${env:BUILD_SOURCESDIRECTORY}\docs" -OutputPath "${env:BUILD_SOURCESDIRECTORY}\src\RestartManager.PowerShell\bin\${env:CONFIGURATION}" -Force
+    displayName: Compile documentation
+    env:
+      CONFIGURATION: $(BuildConfiguration)
+
+  - task: VSBuild@1
+    displayName: Build solution
+    inputs:
+      configuration: $(BuildConfiguration)
+      maximumCpuCount: true
+      platform: $(BuildPlatform)
+      solution: RestartManager.sln
+    env:
+      RunCodeAnalysis: true
+      TreatWarningsAsErrors: true
+
+  - task: NuGetCommand@2
+    displayName: Pack files
+    inputs:
+      command: pack
+      packagesToPack: $(Build.SourcesDirectory)\src\RestartManager.PowerShell\RestartManager.nuspec
+      packDestination: $(Build.ArtifactStagingDirectory)\bin\$(BuildConfiguration)
+      versioningScheme: byEnvVar
+      versionEnvVar: GitPackageVersion
+      includeSymbols: true
+      buildProperties: >
+        CommitId=$(Build.SourceVersion);
+
+  - task: CopyFiles@2
+    displayName: Copy files
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\RestartManager.PowerShell\bin\$(BuildConfiguration)
+      Contents: |
+        RestartManager.ps*
+        RestartManager*.dll
+        RestartManager*.dll-Help.xml
+        about_RestartManager.help.txt
+      TargetFolder: $(Build.BinariesDirectory)\bin\$(BuildConfiguration)
+
+  - task: ArchiveFiles@2
+    displayName: Zip files
+    inputs:
+      rootFolderOrFile: $(Build.BinariesDirectory)\bin\$(BuildConfiguration)
+      archiveFile: $(Build.ArtifactStagingDirectory)\bin\$(BuildConfiguration)\RestartManager.zip
+
+  - powershell: |
+      tools\test.ps1 -verbose
+      packages\Codecov.1.1.0\tools\codecov.exe -f "bin\${env:CONFIGURATION}\RestartManager.coverage.xml"
+    displayName: Test solution
+    env:
+      CONFIGURATION: $(BuildConfiguration)
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: XUnit
+      testResultsFiles: |
+        $(System.DefaultWorkingDirectory)\bin\$(BuildConfiguration)\RestartManager.results.xml
+
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish code coverage
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: |
+        $(System.DefaultWorkingDirectory)\bin\$(BuildConfiguration)\Cobertura.xml
+
+  - task: CopyFiles@2
+    displayName: Copy files
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)
+      Contents: |
+        src\**\bin\$(BuildConfiguration)\**
+      TargetFolder: $(Build.ArtifactStagingDirectory)
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish artifact
+    inputs:
+      PathtoPublish: $(Build.ArtifactStagingDirectory)

@@ -28,7 +28,7 @@ if (!(Test-Path "$outDir")) {
     $null = New-Item "$outDir" -ItemType Directory
 }
 
-$targetargs = "$assemblies -noshadow"
+$targetargs = "$assemblies -noshadow -xml `"$outDir\RestartManager.results.xml`""
 if ($VerbosePreference -eq 'Continue') {
     $targetargs += ' -verbose'
 }
@@ -39,4 +39,12 @@ if ($VerbosePreference -eq 'Continue') {
     '-[RestartManager*.Test]*'
 )
 
-& "$solutionDir\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:"$solutionDir\packages\xunit.runner.console.2.3.1\tools\net452\xunit.console.exe" -targetargs:"$targetargs" -filter:"$filter" -excludebyattribute:"*.ExcludeFromCodeCoverage*" -output:"$outDir\RestartManager.coverage.xml"
+& "$solutionDir\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:"$solutionDir\packages\xunit.runner.console.2.3.1\tools\net452\xunit.console.exe" -targetargs:"$targetargs" -returntargetcode -filter:"$filter" -excludebyattribute:"*.ExcludeFromCodeCoverage*" -output:"$outDir\RestartManager.coverage.xml"
+if ($LASTEXITCODE) {
+    $FailedCount = $LASTEXITCODE
+}
+
+& "$solutionDir\packages\ReportGenerator.4.0.4\tools\net47\ReportGenerator.exe" "-reports:$outDir\RestartManager.coverage.xml" "-targetdir:$outDir" -reporttypes:Cobertura
+if ($FailedCount) {
+    throw "Failed $FailedCount tests"
+}
