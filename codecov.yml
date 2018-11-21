@@ -1,0 +1,10 @@
+codecov:
+  ci:
+  - dev.azure.com
+  token: secret:Xietx+RKVDsU6Cx6RZFtDjwOtxXYn1TUuWzxPD+RJJUFccenXTZpTGXykIRpIlcH51erquo64ah4No+c0Avegj+q3qPpj9kDBFgGmwlvbZA=
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 5
