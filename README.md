@@ -3,7 +3,7 @@
 This module exposes Windows Restart Manager APIs through PowerShell cmdlets for testing applications' compatibility with Windows Restart Manager and for basic scripted installs.
 
 [![Build Status](https://dev.azure.com/heaths/public/_apis/build/status/RestartManager-CI?branchName=develop)](https://dev.azure.com/heaths/public/_build/latest?definitionId=15)
-[![CodeCov](https://codecov.io/gh/heaths/RestartManager/branch/master/graph/badge.svg)](https://codecov.io/gh/heaths/RestartManager)
+[![CodeCov](https://codecov.io/gh/heaths/RestartManager/branch/develop/graph/badge.svg)](https://codecov.io/gh/heaths/RestartManager)
 [![GitHub Release](https://img.shields.io/github/release/heaths/RestartManager.svg)](https://github.com/heaths/RestartManager/releases/latest)
 [![PSGallery](https://img.shields.io/powershellgallery/dt/RestartManager.svg)](https://www.powershellgallery.com/packages/RestartManager)
 

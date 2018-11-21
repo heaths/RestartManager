@@ -1,0 +1,9 @@
+codecov:
+  ci:
+  - dev.azure.com
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 5

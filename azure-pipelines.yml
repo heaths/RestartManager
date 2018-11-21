@@ -76,9 +76,7 @@ jobs:
       rootFolderOrFile: $(Build.BinariesDirectory)\bin\$(BuildConfiguration)
       archiveFile: $(Build.ArtifactStagingDirectory)\bin\$(BuildConfiguration)\RestartManager.zip
 
-  - powershell: |
-      tools\test.ps1 -verbose
-      packages\Codecov.1.1.0\tools\codecov.exe -f "bin\${env:CONFIGURATION}\RestartManager.coverage.xml"
+  - powershell: tools\test.ps1 -verbose
     displayName: Test solution
     env:
       CONFIGURATION: $(BuildConfiguration)
@@ -91,11 +89,29 @@ jobs:
         $(System.DefaultWorkingDirectory)\bin\$(BuildConfiguration)\RestartManager.results.xml
 
   - task: PublishCodeCoverageResults@1
-    displayName: Publish code coverage
+    displayName: Publish code coverage to Azure Pipelines
     inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: |
         $(System.DefaultWorkingDirectory)\bin\$(BuildConfiguration)\Cobertura.xml
+
+  - powershell: |
+      $params = @(
+        '--branch', "${env:BUILD_SOURCEBRANCH}",
+        '--build', "${env:BUILD_BUILDNUMBER}",
+        '--required',
+        '--verbose'
+      )
+      if ($env:BUILD_REASON -eq 'PullRequest') {
+        $params += '--pr', "${env:PULLREQUEST_NUMBER}"
+      }
+      packages\Codecov.1.1.0\tools\codecov.exe --file "bin\${env:CONFIGURATION}\RestartManager.coverage.xml" $params
+    displayName: Publish code coverage to Codecov
+    env:
+      CODECOV_TOKEN: $(Codecov.Token)
+      CONFIGURATION: $(BuildConfiguration)
+      PULLREQUEST_NUMBER: $(System.PullRequest.PullRequestNumber)
+    continueOnError: true
 
   - task: CopyFiles@2
     displayName: Copy files
